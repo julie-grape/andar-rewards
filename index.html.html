@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Andar Rewards — Mobile Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --purple: #7042A0;
+  --purple-dark: #5C3488;
+  --purple-light: #EDE8F6;
+  --purple-mid: #9B6EC8;
+  --yellow: #F2C10F;
+  --yellow-hover: #DFB00E;
+  --green: #1D9B6C;
+  --green-light: #E3F5EE;
+  --red: #D94040;
+  --red-light: #FBEAEA;
+  --text: #18181B;
+  --text-mid: #52525B;
+  --text-soft: #A1A1AA;
+  --card: #FFFFFF;
+  --bg: #EDE8F6;
+  --border: #E4DFF0;
+  --radius: 18px;
+  --radius-sm: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #1a0a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* PHONE FRAME */
+.phone {
+  width: 390px;
+  height: 844px;
+  background: var(--bg);
+  border-radius: 44px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 40px 120px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08);
+}
+
+/* SCREENS */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+.screen.active { display: flex; }
+
+/* HEADER */
+.hdr {
+  background: var(--purple);
+  padding: 52px 20px 20px;
+  flex-shrink: 0;
+}
+.hdr-row { display: flex; align-items: center; gap: 10px; }
+.back-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,.15);
+  border: none; cursor: pointer; color: white;
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.hdr-title { color: white; font-size: 20px; font-weight: 600; }
+.hdr-sub { color: rgba(255,255,255,.65); font-size: 13px; margin-top: 3px; }
+
+/* SCROLL AREA */
+.scroll { flex: 1; overflow-y: auto; padding: 16px; scroll-behavior: smooth; }
+.scroll::-webkit-scrollbar { display: none; }
+
+/* BOTTOM NAV */
+.nav {
+  background: white;
+  display: flex;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  padding-bottom: 8px;
+}
+.nav-btn {
+  flex: 1; border: none; background: none; cursor: pointer;
+  padding: 10px 4px 4px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  color: var(--text-soft); font-size: 10px; font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  position: relative; transition: color .15s;
+}
+.nav-btn.active { color: var(--purple); }
+.nav-btn svg { width: 22px; height: 22px; }
+.nav-badge {
+  position: absolute; top: 6px; right: 50%;
+  transform: translateX(8px);
+  background: var(--red); color: white;
+  font-size: 9px; font-weight: 700; min-width: 16px; height: 16px;
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  padding: 0 4px;
+}
+.nav-msg-center {
+  position: relative;
+}
+.nav-msg-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--purple);
+  display: flex; align-items: center; justify-content: center;
+  margin-top: -4px;
+  box-shadow: 0 4px 12px rgba(112,66,160,.4);
+}
+.nav-msg-dot svg { color: white; width: 16px; height: 16px; }
+
+/* CARDS */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+.card-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.card-sub { font-size: 12px; color: var(--text-soft); }
+
+/* BUTTONS */
+.btn-yellow {
+  width: 100%; padding: 16px;
+  background: var(--yellow); border: none; border-radius: 32px;
+  font-size: 15px; font-weight: 700; color: var(--purple-dark);
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: background .15s, transform .1s;
+}
+.btn-yellow:active { transform: scale(.97); background: var(--yellow-hover); }
+
+.btn-purple {
+  width: 100%; padding: 14px;
+  background: var(--purple); border: none; border-radius: 32px;
+  font-size: 14px; font-weight: 600; color: white;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: background .15s, transform .1s;
+}
+.btn-purple:active { transform: scale(.97); }
+
+.btn-outline {
+  width: 100%; padding: 14px;
+  background: transparent; border: 1.5px solid var(--purple); border-radius: 32px;
+  font-size: 14px; font-weight: 600; color: var(--purple);
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+
+/* PROGRESS BAR */
+.progress-wrap { background: rgba(255,255,255,.2); border-radius: 4px; height: 6px; overflow: hidden; margin: 10px 0 4px; }
+.progress-fill { height: 100%; background: var(--yellow); border-radius: 4px; transition: width .4s; }
+.progress-fill-dark { height: 100%; background: rgba(255,255,255,.5); border-radius: 4px; }
+
+/* FILTER PILLS */
+.pills { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0; margin-bottom: 14px; }
+.pills::-webkit-scrollbar { display: none; }
+.pill {
+  flex-shrink: 0; padding: 8px 16px; border-radius: 32px;
+  font-size: 13px; font-weight: 500; cursor: pointer; border: 1.5px solid var(--border);
+  background: white; color: var(--text-mid); transition: all .15s;
+}
+.pill.active { background: var(--purple); color: white; border-color: var(--purple); }
+
+/* TAGS */
+.tag-green { background: var(--green-light); color: var(--green); font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
+.tag-gray { background: #F4F4F5; color: var(--text-soft); font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
+
+/* INPUT */
+.field { margin-bottom: 16px; }
+.field label { font-size: 13px; font-weight: 600; color: var(--text); display: block; margin-bottom: 6px; }
+.field input {
+  width: 100%; padding: 14px 16px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 15px; font-family: 'DM Sans', sans-serif; color: var(--text);
+  background: white; outline: none;
+}
+.field input:focus { border-color: var(--purple); }
+.field input::placeholder { color: var(--text-soft); }
+
+/* DIVIDER */
+.divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+
+/* ═══════════════════════════════════════════════
+   SCREEN 1 — AGE GATE
+══════════════════════════════════════════════════ */
+#s-agegate {
+  background: var(--purple);
+  align-items: center; justify-content: center;
+  padding: 40px 32px;
+  text-align: center;
+}
+.age-badge {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: rgba(255,255,255,.12); border: 3px solid rgba(255,255,255,.3);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 28px;
+  font-size: 38px; font-weight: 700; color: var(--yellow);
+  font-family: 'DM Serif Display', serif;
+}
+#s-agegate h1 { color: white; font-size: 26px; font-weight: 700; margin-bottom: 10px; }
+#s-agegate p { color: rgba(255,255,255,.6); font-size: 14px; line-height: 1.6; margin-bottom: 36px; }
+.age-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.age-deny { background: rgba(255,255,255,.12); color: white; border: none; border-radius: 32px; padding: 14px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.age-legal { color: rgba(255,255,255,.4); font-size: 11px; margin-top: 20px; line-height: 1.5; }
+
+/* ═══════════════════════════════════════════════
+   SCREEN 2 — ONBOARDING
+══════════════════════════════════════════════════ */
+#s-onboarding {
+  background: var(--purple);
+  justify-content: space-between;
+  padding: 0;
+}
+.ob-skip { position: absolute; top: 52px; right: 20px; color: rgba(255,255,255,.5); font-size: 14px; cursor: pointer; border: none; background: none; font-family: 'DM Sans', sans-serif; }
+.ob-logo-wrap { flex: 1; display: flex; align-items: center; justify-content: center; }
+.ob-logo-box {
+  width: 260px; height: 150px; border-radius: 28px;
+  background: white; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  padding: 20px 24px;
+}
+.ob-logo-text { font-size: 28px; font-weight: 800; color: var(--purple); font-family: 'DM Serif Display', serif; letter-spacing: -1px; }
+.ob-logo-crown { font-size: 36px; }
+.ob-logo-sub { font-size: 9px; font-weight: 600; color: var(--purple-mid); letter-spacing: 2px; }
+.ob-dots { display: flex; gap: 6px; justify-content: center; padding-bottom: 16px; }
+.ob-dot { width: 22px; height: 5px; border-radius: 3px; background: var(--yellow); }
+.ob-dot.inactive { width: 5px; background: rgba(255,255,255,.3); }
+.ob-bottom { background: var(--purple); padding: 0 24px 44px; }
+.ob-title { color: white; font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 8px; }
+.ob-desc { color: rgba(255,255,255,.6); font-size: 14px; text-align: center; margin-bottom: 24px; line-height: 1.5; }
+
+/* ═══════════════════════════════════════════════
+   SCREEN 3 — LOGIN / REGISTER CHOICE
+══════════════════════════════════════════════════ */
+#s-auth {
+  background: var(--purple);
+  justify-content: flex-end;
+}
+.auth-logo { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; }
+.auth-logo-box { width: 100px; height: 100px; background: white; border-radius: 24px; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
+.auth-tagline { color: rgba(255,255,255,.6); font-size: 14px; text-align: center; padding: 0 32px; }
+.auth-sheet {
+  background: white; border-radius: 32px 32px 0 0;
+  padding: 28px 24px 44px;
+}
+.auth-sheet h2 { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.auth-sheet p { font-size: 13px; color: var(--text-mid); margin-bottom: 24px; line-height: 1.5; }
+.auth-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
+.auth-divider span { color: var(--text-soft); font-size: 12px; }
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.earn-banner {
+  background: var(--purple-light); border-radius: var(--radius-sm);
+  padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-top: 12px;
+  cursor: pointer; border: 1.5px solid transparent; transition: border-color .15s;
+}
+.earn-banner:hover { border-color: var(--purple); }
+.earn-banner-icon { font-size: 22px; }
+.earn-banner-text strong { font-size: 13px; color: var(--purple-dark); display: block; }
+.earn-banner-text span { font-size: 11px; color: var(--text-mid); }
+.earn-banner-arrow { margin-left: auto; color: var(--purple); font-size: 16px; }
+
+/* ═══════════════════════════════════════════════
+   SCREEN 4 — HOME
+══════════════════════════════════════════════════ */
+.home-hdr {
+  background: var(--purple);
+  padding: 52px 20px 20px;
+  flex-shrink: 0;
+}
+.home-hdr-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.home-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--yellow); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--purple-dark); font-size: 16px; }
+.home-welcome { color: rgba(255,255,255,.7); font-size: 12px; }
+.home-name { color: white; font-size: 16px; font-weight: 600; }
+.notif-btn { position: relative; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.12); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; }
+.notif-btn .nav-badge { top: 2px; right: 2px; transform: none; }
+
+/* Dual balance card */
+.balance-card {
+  background: white; border-radius: 20px; padding: 18px 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.12);
+}
+.balance-row { display: flex; gap: 12px; }
+.balance-col { flex: 1; }
+.balance-label { font-size: 10px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+.balance-amount { font-size: 28px; font-weight: 700; color: var(--purple); line-height: 1; }
+.balance-unit { font-size: 13px; font-weight: 400; color: var(--text-mid); }
+.balance-divider { width: 1px; background: var(--border); }
+.balance-source { font-size: 10px; color: var(--text-soft); margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+.balance-source .dot { width: 5px; height: 5px; border-radius: 50%; }
+.tier-row { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+.tier-badge { background: var(--purple); color: white; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 8px; }
+.tier-progress-text { font-size: 11px; color: var(--text-soft); }
+.progress-wrap-home { background: var(--border); border-radius: 4px; height: 5px; overflow: hidden; margin-top: 8px; }
+.progress-fill-home { height: 100%; background: linear-gradient(90deg, var(--purple), var(--purple-mid)); border-radius: 4px; width: 65%; }
+
+/* Jackpot button */
+.jackpot-btn {
+  background: linear-gradient(135deg, #F2C10F, #E8A800);
+  border: none; border-radius: 18px;
+  padding: 16px 20px; width: 100%;
+  display: flex; align-items: center; gap: 14px;
+  cursor: pointer; box-shadow: 0 6px 24px rgba(242,193,15,.4);
+  margin-bottom: 12px; transition: transform .1s, box-shadow .1s;
+  font-family: 'DM Sans', sans-serif;
+}
+.jackpot-btn:active { transform: scale(.97); box-shadow: 0 2px 12px rgba(242,193,15,.3); }
+.jackpot-icon { font-size: 28px; }
+.jackpot-text strong { display: block; font-size: 15px; font-weight: 700; color: var(--purple-dark); }
+.jackpot-text span { font-size: 11px; color: rgba(90,40,140,.6); }
+.jackpot-arrow { margin-left: auto; font-size: 20px; color: var(--purple-dark); }
+
+/* Active stay */
+.active-stay {
+  background: var(--card); border-radius: var(--radius);
+  padding: 16px; margin-bottom: 12px;
+  border: 1.5px solid var(--border);
+}
+.stay-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.stay-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.stay-live { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--green); font-weight: 500; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+.stay-row { display: flex; justify-content: space-between; align-items: flex-start; }
+.stay-info label { font-size: 11px; color: var(--text-soft); }
+.stay-info strong { display: block; font-size: 14px; font-weight: 600; color: var(--text); }
+.stay-rate { text-align: right; }
+.stay-rate label { font-size: 11px; color: var(--text-soft); }
+.stay-rate strong { display: block; font-size: 14px; font-weight: 700; color: var(--purple); }
+.track-btn { margin-top: 12px; background: var(--purple); color: white; border: none; border-radius: 32px; width: 100%; padding: 13px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+/* Recent activity */
+.section-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.section-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.section-link { font-size: 12px; color: var(--purple); font-weight: 500; cursor: pointer; }
+.tx-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.tx-item:last-child { border-bottom: none; }
+.tx-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+.tx-icon.earn { background: var(--green-light); }
+.tx-icon.spend { background: var(--red-light); }
+.tx-label { font-size: 13px; font-weight: 500; color: var(--text); }
+.tx-date { font-size: 11px; color: var(--text-soft); margin-top: 2px; }
+.tx-amount { margin-left: auto; font-size: 14px; font-weight: 700; }
+.tx-amount.earn { color: var(--green); }
+.tx-amount.spend { color: var(--red); }
+
+/* ═══════════════════════════════════════════════
+   SCREEN 5 — MESSAGES
+══════════════════════════════════════════════════ */
+.msg-hdr { background: var(--purple); padding: 52px 20px 16px; flex-shrink: 0; }
+.msg-hdr-title { color: white; font-size: 20px; font-weight: 700; }
+.msg-hdr-sub { color: rgba(255,255,255,.6); font-size: 13px; margin-top: 2px; }
+
+/* Jackpot CTA in messages */
+.jackpot-cta {
+  background: linear-gradient(135deg, var(--yellow) 0%, #E8A800 100%);
+  border-radius: 20px; padding: 18px 20px; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+  box-shadow: 0 8px 28px rgba(242,193,15,.35);
+  border: none; width: 100%; font-family: 'DM Sans', sans-serif;
+  transition: transform .1s;
+}
+.jackpot-cta:active { transform: scale(.97); }
+.jackpot-cta-icon { font-size: 36px; }
+.jackpot-cta-body { text-align: left; }
+.jackpot-cta-body strong { display: block; font-size: 17px; font-weight: 800; color: var(--purple-dark); }
+.jackpot-cta-body span { font-size: 12px; color: rgba(90,40,140,.6); line-height: 1.4; display: block; margin-top: 2px; }
+.jackpot-cta-arrow { margin-left: auto; font-size: 22px; color: var(--purple-dark); }
+
+.contact-host {
+  background: var(--card); border-radius: var(--radius); padding: 16px;
+  margin-bottom: 14px; border: 1.5px solid var(--border);
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+}
+.contact-host-icon { width: 44px; height: 44px; border-radius: 50%; background: var(--purple-light); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+.contact-host-text strong { font-size: 14px; font-weight: 600; color: var(--text); }
+.contact-host-text span { font-size: 12px; color: var(--text-soft); display: block; margin-top: 2px; }
+.contact-host-arrow { margin-left: auto; color: var(--text-soft); font-size: 16px; }
+
+.msg-section { font-size: 12px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
+
+.msg-thread {
+  background: var(--card); border-radius: var(--radius); padding: 14px 16px;
+  margin-bottom: 10px; display: flex; gap: 12px; cursor: pointer;
+  border: 1.5px solid var(--border); transition: border-color .15s;
+}
+.msg-thread:hover { border-color: var(--purple); }
+.msg-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+.msg-thread-body { flex: 1; min-width: 0; }
+.msg-thread-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+.msg-thread-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.msg-thread-time { font-size: 11px; color: var(--text-soft); }
+.msg-thread-preview { font-size: 13px; color: var(--text-mid); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msg-unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple); margin-top: 6px; flex-shrink: 0; }
+
+/* Compose */
+.compose-bar { display: flex; gap: 10px; padding: 12px 16px; background: white; border-top: 1px solid var(--border); }
+.compose-input { flex: 1; background: var(--purple-light); border: none; border-radius: 24px; padding: 10px 16px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; }
+.compose-send { width: 40px; height: 40px; border-radius: 50%; background: var(--purple); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+/* ═══════════════════════════════════════════════
+   SCREEN 6 — REWARDS
+══════════════════════════════════════════════════ */
+.rewards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.reward-card {
+  background: white; border-radius: var(--radius); overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06); cursor: pointer;
+}
+.reward-img { background: var(--purple-light); height: 110px; display: flex; align-items: center; justify-content: center; font-size: 44px; }
+.reward-body { padding: 12px; }
+.reward-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; line-height: 1.3; }
+.reward-pts { font-size: 14px; font-weight: 700; color: var(--purple); margin-bottom: 10px; }
+.reward-btn { background: var(--purple); color: white; border: none; border-radius: 32px; width: 100%; padding: 9px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+/* ═══════════════════════════════════════════════
+   SCREEN 7 — OFFERS
+══════════════════════════════════════════════════ */
+.offer-featured {
+  background: var(--purple); border-radius: var(--radius); padding: 18px;
+  margin-bottom: 10px; cursor: pointer;
+}
+.offer-featured-tag { background: var(--yellow); color: var(--purple-dark); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 8px; display: inline-block; margin-bottom: 12px; }
+.offer-featured-time { float: right; color: rgba(255,255,255,.5); font-size: 11px; margin-top: 2px; }
+.offer-featured h3 { color: white; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.offer-featured p { color: rgba(255,255,255,.65); font-size: 12px; line-height: 1.5; margin-bottom: 12px; }
+.offer-bonus { background: rgba(255,255,255,.12); border-radius: 8px; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; color: white; font-size: 12px; font-weight: 500; }
+
+.offer-item {
+  background: white; border-radius: var(--radius); padding: 14px 16px;
+  margin-bottom: 10px; display: flex; gap: 12px; align-items: center;
+  cursor: pointer;
+}
+.offer-item-icon { font-size: 28px; }
+.offer-item-body { flex: 1; min-width: 0; }
+.offer-item-name { font-size: 14px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.offer-item-badge { background: var(--yellow); color: var(--purple-dark); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
+.offer-item-desc { font-size: 12px; color: var(--text-mid); margin-top: 3px; }
+.offer-item-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.offer-pts { color: var(--purple); font-size: 12px; font-weight: 600; }
+.offer-expiry { color: var(--text-soft); font-size: 11px; }
+
+/* ═══════════════════════════════════════════════
+   SCREEN 8 — AMENITIES
+══════════════════════════════════════════════════ */
+.amenity-item {
+  background: white; border-radius: var(--radius); padding: 14px 16px;
+  margin-bottom: 10px; display: flex; gap: 14px; align-items: center;
+}
+.amenity-icon-wrap { width: 52px; height: 52px; border-radius: 14px; background: var(--purple-light); display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+.amenity-body { flex: 1; min-width: 0; }
+.amenity-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.amenity-desc { font-size: 11px; color: var(--text-mid); margin-bottom: 5px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.amenity-meta { display: flex; gap: 10px; }
+.amenity-meta span { font-size: 11px; color: var(--text-soft); display: flex; align-items: center; gap: 3px; }
+.amenity-status { font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.amenity-status.open { color: var(--green); }
+.amenity-status.closed { color: var(--text-soft); }
+
+/* ═══════════════════════════════════════════════
+   SCREEN 9 — ACCOUNT
+══════════════════════════════════════════════════ */
+.account-hdr {
+  background: var(--purple);
+  padding: 52px 20px 20px;
+  flex-shrink: 0;
+}
+.account-user { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.account-avatar { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: white; }
+.account-name { color: white; font-size: 18px; font-weight: 700; }
+.account-since { color: rgba(255,255,255,.5); font-size: 12px; }
+.account-tier-tag { background: rgba(255,255,255,.15); border-radius: 8px; padding: 3px 10px; color: var(--yellow); font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; }
+.account-balance-card { background: white; border-radius: 18px; padding: 16px 18px; }
+.account-bal-main { font-size: 32px; font-weight: 700; color: var(--purple); display: flex; align-items: baseline; gap: 6px; }
+.account-bal-unit { font-size: 16px; font-weight: 400; color: var(--text-mid); }
+.account-bal-sub { font-size: 12px; color: var(--text-soft); margin-top: 6px; }
+.account-casino-bal { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.account-casino-label { font-size: 12px; color: var(--text-soft); }
+.account-casino-amount { font-size: 14px; font-weight: 700; color: var(--text); }
+.account-casino-source { font-size: 10px; color: var(--text-soft); text-align: right; }
+
+.menu-card { background: white; border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; }
+.menu-item {
+  display: flex; align-items: center; gap: 14px; padding: 16px;
+  border-bottom: 1px solid var(--border); cursor: pointer;
+  transition: background .1s;
+}
+.menu-item:last-child { border-bottom: none; }
+.menu-item:hover { background: var(--purple-light); }
+.menu-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.menu-text strong { display: block; font-size: 14px; font-weight: 600; color: var(--text); }
+.menu-text span { font-size: 12px; color: var(--text-soft); }
+.menu-arrow { margin-left: auto; color: var(--text-soft); font-size: 16px; }
+.menu-badge { background: var(--purple); color: white; font-size: 11px; font-weight: 700; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-left: auto; margin-right: 8px; }
+.signout-item { color: var(--red); cursor: pointer; display: flex; align-items: center; gap: 14px; padding: 16px; background: white; border-radius: var(--radius); }
+.signout-icon { width: 38px; height: 38px; border-radius: 10px; background: var(--red-light); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+/* ═══════════════════════════════════════════════
+   REGISTER SCREEN (full)
+══════════════════════════════════════════════════ */
+#s-register .hdr {
+  padding-bottom: 24px;
+}
+.bonus-card {
+  background: var(--purple-light); border-radius: var(--radius-sm); padding: 14px;
+  margin-bottom: 20px; display: flex; align-items: flex-start; gap: 10px;
+  border: 1.5px solid rgba(112,66,160,.2);
+}
+.bonus-icon { font-size: 22px; }
+.bonus-text strong { font-size: 13px; color: var(--purple-dark); display: block; margin-bottom: 2px; }
+.bonus-text span { font-size: 11px; color: var(--text-mid); line-height: 1.4; }
+.card-link-field {
+  background: var(--purple-light); border-radius: var(--radius-sm);
+  padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px; cursor: pointer; border: 1.5px dashed rgba(112,66,160,.3);
+}
+.card-link-text strong { font-size: 13px; color: var(--purple-dark); display: block; }
+.card-link-text span { font-size: 11px; color: var(--text-mid); }
+.card-link-arrow { margin-left: auto; color: var(--purple); }
+
+/* MODALS */
+.modal-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,.5);
+  display: none; align-items: flex-end; z-index: 100;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.active { display: flex; }
+.modal-sheet {
+  background: white; border-radius: 28px 28px 0 0; padding: 24px;
+  width: 100%; animation: slideUp .25s ease;
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
+.modal-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.modal-sub { font-size: 13px; color: var(--text-mid); margin-bottom: 20px; line-height: 1.5; }
+.modal-close { position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; border-radius: 50%; background: var(--bg); border: none; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+
+/* SCREEN INDICATOR */
+.screen-indicator {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,.6); color: white; font-size: 11px;
+  padding: 6px 14px; border-radius: 20px; font-family: 'DM Sans', sans-serif;
+  backdrop-filter: blur(8px); pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- ══════════ SCREEN: AGE GATE ══════════ -->
+  <div class="screen active" id="s-agegate">
+    <button class="ob-skip" style="color:rgba(255,255,255,.4)">ⓘ Help</button>
+    <div class="age-badge">21+</div>
+    <h1>Age Verification Required</h1>
+    <p>Andar Rewards is a casino loyalty platform. You must be 21 years of age or older to access this application.</p>
+    <div class="age-actions">
+      <button class="btn-yellow" onclick="go('s-onboarding')">I am 21 or older — Enter</button>
+      <button class="age-deny">I am under 21</button>
+    </div>
+    <p class="age-legal">By entering, you confirm you are of legal gambling age in your jurisdiction. This app does not support real-money gambling.</p>
+  </div>
+
+  <!-- ══════════ SCREEN: ONBOARDING ══════════ -->
+  <div class="screen" id="s-onboarding">
+    <button class="ob-skip" onclick="go('s-auth')">Skip</button>
+    <div class="ob-logo-wrap">
+      <div class="ob-logo-box"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMiIgZGF0YS1uYW1lPSJMYXllciAyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNjMuODciIGhlaWdodD0iMTA3LjMiIHZpZXdCb3g9IjAgMCAyNjMuODcgMTA3LjMiPgogIDxnIGlkPSJMYXllcl8xLTIiIGRhdGEtbmFtZT0iTGF5ZXIgMSI+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTAsMTA0LjRjLjctLjExLDEuMjUtLjQ2LDEuNjYtMS4wNS40LS41OS43OS0xLjI3LDEuMTctMi4wMmwyMC43NS00NS45MmMuMzgtLjcuNzEtMS4zNSwxLjAxLTEuOTQuMy0uNTkuNDUtMS4xLjQ1LTEuNTQsMC0uNTQtLjE5LS45Mi0uNTctMS4xMy0uMzgtLjIyLS43OC0uMzgtMS4yMS0uNDl2LTEuNDZoMTMuNjd2MS40NmMtLjM4LjExLS43Ni4yNi0xLjEzLjQ1LS4zOC4xOS0uNTcuNTgtLjU3LDEuMTcsMCwuNDMuMDkuODYuMjgsMS4yOS4xOS40My40NywxLC44NSwxLjdsMTYuODIsMzIuOTJjLjI3LjU5LjYzLDEuMDIsMS4wOSwxLjI5LjQ2LjI3Ljk4LjU0LDEuNTguODF2MS40NmgtMTQuMjR2LTEuNDZjLjIyLDAsLjQ5LS4wOC44MS0uMjQuMzItLjE2LjQ5LS40LjQ5LS43MywwLS41NC0uMjItMS4yNC0uNjUtMi4xbC0zLjA3LTUuOThoLTE5Ljc0bC04LjY5LDIwLjJjLS41NCwxLjEzLS44MSwxLjk0LS44MSwyLjQzLDAsLjU5LjUxLjg5LDEuNTQuODl2MS40Nkgwdi0xLjQ2Wk0zNi4yOCw3NC45bC02Ljc5LTE1LjA0LTcuNiwxNS4wNGgxNC40WiIgZmlsbD0iIzdmM2Y5OCIvPgogICAgICA8cGF0aCBkPSJNNTYuNSw4OS45NWMxLjAyLDAsMS41NC0uNDksMS41NC0xLjQ2di0zNi43MmMwLS45Ny0uNTEtMS40Ni0xLjU0LTEuNDZ2LTEuNDZoMTMuODN2MS40NmMtLjQzLDAtLjY1LjI3LS42NS44MSwwLC40My41NCwxLjE5LDEuNjIsMi4yN2wyMy4yMSwyNC4xVjI1Ljc1YzAtLjk3LS43LTEuNDYtMi4xLTEuNDZ2LTEuNDZoMTIuMjF2MS40NmMtMS4wMiwwLTEuNTQuNDktMS41NCwxLjQ2djYyLjc0YzAsLjk3LjUxLDEuNDYsMS41NCwxLjQ2djEuNDZoLTEzLjF2LTEuNDZjLjcsMCwxLjA1LS4yNCwxLjA1LS43MywwLS4zOC0uNDMtMS0xLjI5LTEuODZsLTI0LjY3LTI1LjcydjI2Ljg1YzAsLjk3LjYyLDEuNDYsMS44NiwxLjQ2djEuNDZoLTExLjk3di0xLjQ2WiIgZmlsbD0iIzdmM2Y5OCIvPgogICAgICA8cGF0aCBkPSJNMTM2LjAxLDQ4Ljg2YzIuOTYsMCw1LjczLjQzLDguMjksMS4yOSwyLjU2Ljg2LDQuNzgsMi4xNyw2LjY3LDMuOTIsMS44OSwxLjc1LDMuMzcsMy45Niw0LjQ1LDYuNjMsMS4wOCwyLjY3LDEuNjIsNS44MSwxLjYyLDkuNDJzLS41NCw2Ljc1LTEuNjIsOS40MmMtMS4wOCwyLjY3LTIuNTYsNC44OC00LjQ1LDYuNjMtMS44OSwxLjc1LTQuMTEsMy4wNi02LjY3LDMuOTItMi41Ni44Ni01LjMzLDEuMjktOC4yOSwxLjI5aC0yNi44NXYtMS40NmMxLjI0LDAsMS44Ni0uNDksMS44Ni0xLjQ2di0zNi43MmMwLS45Ny0uNjItMS40Ni0xLjg2LTEuNDZ2LTEuNDZoMjYuODVaTTEzMi43Nyw4NC40NWMyLjUzLDAsNC43NC0uMjIsNi42My0uNjUsMS44OS0uNDMsMy40NS0xLjIsNC42OS0yLjMsMS4yNC0xLjEsMi4xNy0yLjU3LDIuNzktNC40MS42Mi0xLjgzLjkzLTQuMTUuOTMtNi45NnMtLjMxLTUuMTItLjkzLTYuOTZjLS42Mi0xLjgzLTEuNTUtMy4zLTIuNzktNC40MS0xLjI0LTEuMS0yLjgtMS44Ny00LjY5LTIuMy0xLjg5LS40My00LjEtLjY1LTYuNjMtLjY1aC0xMi41NHYyOC42M2gxMi41NFoiIGZpbGw9IiM3ZjNmOTgiLz4KICAgICAgPHBhdGggZD0iTTE1NC4zNyw4OS45NWMuNy0uMTEsMS4yNS0uNDYsMS42Ni0xLjA1LjQtLjU5Ljc5LTEuMjcsMS4xNy0yLjAybDE0Ljk2LTMxLjQ2Yy4zOC0uNy43MS0xLjM1LDEuMDEtMS45NC4zLS41OS40NS0xLjEuNDUtMS41NCwwLS41NC0uMTktLjkyLS41Ny0xLjEzLS4zOC0uMjItLjc4LS4zOC0xLjIxLS40OXYtMS40NmgxMy42N3YxLjQ2Yy0uMzguMTEtLjc2LjI2LTEuMTMuNDUtLjM4LjE5LS41Ny41OC0uNTcsMS4xNywwLC40My4wOS44Ni4yOCwxLjI5LjE5LjQzLjQ3LDEsLjg1LDEuN2wxNi44MiwzMi45MmMuMjcuNTkuNjMsMS4wMiwxLjA5LDEuMjkuNDYuMjcuOTguNTQsMS41OC44MXYxLjQ2aC0xNC4yNHYtMS40NmMuMjIsMCwuNDktLjA4LjgxLS4yNC4zMi0uMTYuNDktLjQuNDktLjczLDAtLjU0LS4yMi0xLjI0LS42NS0yLjFsLTMuMDctNS45OGgtMTkuNzRsLTIuOTEsNS43NGMtLjU0LDEuMTMtLjgxLDEuOTQtLjgxLDIuNDMsMCwuNTkuNTEuODksMS41NC44OXYxLjQ2aC0xMS40OXYtMS40NlpNMTg0Ljg2LDc0LjlsLTYuNzktMTUuMDQtNy42LDE1LjA0aDE0LjRaIiBmaWxsPSIjN2YzZjk4Ii8+CiAgICAgIDxwYXRoIGQ9Ik0yMzEuODUsNDguODZjMi41OSwwLDQuOTMuMjMsNy4wNC42OSwyLjEuNDYsMy45MSwxLjE5LDUuNDIsMi4xOCwxLjUxLDEsMi42NywyLjI5LDMuNDgsMy44OC44MSwxLjU5LDEuMjEsMy41NSwxLjIxLDUuODYsMCwzLjU2LTEuMDUsNi4yOC0zLjE1LDguMTctMi4xLDEuODktNC45MywzLjE1LTguNDksMy44bDIzLjc3LDMxLjI3Yy4zOC41NC44Mi44NiwxLjMzLjk3LjUxLjExLjk4LjE2LDEuNDIuMTZ2MS40NmgtMTUuMTN2LTEuNDZjLjQ5LDAsLjktLjA4LDEuMjUtLjI0LjM1LS4xNi41My0uMzguNTMtLjY1cy0uMTEtLjU4LS4zMi0uOTNjLS4yMi0uMzUtLjU0LS44Mi0uOTctMS40MmwtMjEuOTEtMjguNTJoLTExLjU3djE0LjRjMCwuNDkuMTcuODUuNTMsMS4wOS4zNS4yNC45OC4zNiwxLjkuMzZ2MS40NmgtMTMuOTl2LTEuNDZjMS41NiwwLDIuMzUtLjQ5LDIuMzUtMS40NnYtMzYuNzJjMC0uOTctLjc4LTEuNDYtMi4zNS0xLjQ2di0xLjQ2aDI3LjY2Wk0yMjkuNzUsNjcuNzhjMS45NCwwLDMuNTYtLjE1LDQuODUtLjQ1LDEuMjktLjMsMi4zMi0uNzEsMy4wNy0xLjI1Ljc1LS41NCwxLjI5LTEuMTcsMS42Mi0xLjkuMzItLjczLjQ5LTEuNTIuNDktMi4zOXMtLjE2LTEuNjYtLjQ5LTIuMzljLS4zMi0uNzMtLjg2LTEuMzYtMS42Mi0xLjktLjc2LS41NC0xLjc4LS45Ni0zLjA3LTEuMjUtMS4yOS0uMy0yLjkxLS40NS00Ljg1LS40NWgtMTMuOTl2MTEuOTdoMTMuOTlaIiBmaWxsPSIjN2YzZjk4Ii8+CiAgICA8L2c+CiAgICA8cGF0aCBkPSJNMTc5LjQsMzYuNzljMTIsMCwyMi44MiwzLjQyLDMwLjQ1LDguODlsMTcuNDgtMjMuNzNjLTQuNzgsMy40NS0xMC41NCw1LjQ2LTE2Ljc0LDUuNDYtMTUuMDgsMC0yOS4xMS0xMS45MS0zMS4xOS0yNy40LTIuMDgsMTUuNDktMTYuMSwyNy40LTMxLjE4LDI3LjQtNi4yLDAtMTEuOTYtMi4wMS0xNi43NC01LjQ2bDE3LjQ4LDIzLjczYzcuNjMtNS40NywxOC40NS04Ljg5LDMwLjQ1LTguODlaIiBmaWxsPSIjZmZkZTE3Ii8+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTQ0LjA1LDk1LjA1aDUuMzZjMS4xOSwwLDIuMTYuMTEsMi45My4zMnMxLjM3LjQ5LDEuODEuODJjLjQ0LjM0Ljc0LjcyLjkxLDEuMTMuMTcuNDIuMjUuODIuMjUsMS4yMiwwLC43NC0uMTgsMS4zNy0uNTMsMS44OC0uMzUuNTEtLjk1LjkzLTEuNzgsMS4yOGwzLjA3LDQuOWgtMy40MWwtMi41NC00LjMzaC0yLjk2djQuMzNoLTMuMTF2LTExLjU0Wk00OS42MiwxMDAuMjZjLjQ5LDAsLjktLjA0LDEuMjMtLjEyLjMyLS4wOC41OC0uMTkuNzctLjM0LjE5LS4xNS4zMi0uMzIuMzktLjUzLjA3LS4yLjExLS40My4xMS0uNjgsMC0uMjEtLjA0LS40LS4xMy0uNTktLjA4LS4xOS0uMjMtLjM2LS40My0uNS0uMi0uMTUtLjQ5LS4yNi0uODUtLjM0cy0uODItLjEyLTEuMzctLjEyaC0yLjE4djMuMjJoMi40NloiIGZpbGw9IiM2ZDZlNzEiLz4KICAgICAgPHBhdGggZD0iTTU3LjU4LDk1LjA1aDMuMTZ2Ni44N2MwLC45OC4yMywxLjcxLjY4LDIuMTguNDUuNDcsMS4yMS43MSwyLjI3LjcxczEuODEtLjI0LDIuMjYtLjcxYy40NC0uNDcuNjctMS4yLjY3LTIuMTh2LTYuODdoMy4xNnY2Ljg3YzAsLjg3LS4xNCwxLjYyLS40MiwyLjI1LS4yOC42Mi0uNjksMS4xNC0xLjIxLDEuNTRzLTEuMTYuNy0xLjkyLjg5Yy0uNzYuMTktMS42MS4yOC0yLjU1LjI4cy0xLjgyLS4xLTIuNTctLjI5Yy0uNzYtLjE5LTEuMzktLjQ5LTEuOTItLjlzLS45Mi0uOTItMS4xOS0xLjU2Yy0uMjctLjY0LS40LTEuMzktLjQtMi4yNnYtNi44MloiIGZpbGw9IiM2ZDZlNzEiLz4KICAgICAgPHBhdGggZD0iTTcyLjU2LDk1LjA1aDMuMTZ2OS40N2g3LjE2bC0uMzQsMi4wN2gtOS45OHYtMTEuNTRaIiBmaWxsPSIjNmQ2ZTcxIi8+CiAgICAgIDxwYXRoIGQ9Ik04NC45Miw5NS4wNWgxMC4zMXYyLjA1aC03LjE2djIuNTJoNi43NHYyLjA3aC02Ljc0djIuODRoNy42bC0uMzIsMi4wNWgtMTAuNDR2LTExLjU0WiIgZmlsbD0iIzZkNmU3MSIvPgogICAgICA8cGF0aCBkPSJNMTA2LjM0LDEwMS44OWwtNS4yMy02Ljg0aDMuNTJsMy4yNiw0LjY3LDMuMzctNC42N2gzLjM1bC01LjEsNi44NHY0LjcxaC0zLjE2di00LjcxWiIgZmlsbD0iIzZkNmU3MSIvPgogICAgICA8cGF0aCBkPSJNMTIxLjcxLDEwNi44OWMtMS4xMywwLTIuMTQtLjE0LTMuMDMtLjQyLS44OS0uMjgtMS42NS0uNjgtMi4yNy0xLjIxLS42Mi0uNTMtMS4xLTEuMTYtMS40My0xLjkxLS4zMy0uNzQtLjUtMS41OC0uNS0yLjUycy4xNy0xLjc4LjUtMi41MmMuMzMtLjc0LjgxLTEuMzgsMS40NC0xLjkxLjYzLS41MywxLjM5LS45MywyLjI4LTEuMjEuODktLjI4LDEuODktLjQyLDMuMDEtLjQyczIuMTQuMTQsMy4wMy40MmMuODkuMjgsMS42NC42OCwyLjI2LDEuMjEuNjEuNTMsMS4wOCwxLjE2LDEuNDEsMS45MS4zMi43NC40OSwxLjU4LjQ5LDIuNTJzLS4xNiwxLjc4LS40OCwyLjUyYy0uMzIuNzQtLjc4LDEuMzgtMS40LDEuOTEtLjYxLjUzLTEuMzcuOTMtMi4yNiwxLjIxLS44OS4yOC0xLjkxLjQyLTMuMDUuNDJaTTEyMS42OSwxMDQuODJjMS4zMywwLDIuMzItLjM0LDIuOTctMS4wNC42NS0uNjkuOTctMS42OC45Ny0yLjk2cy0uMzItMi4yNi0uOTctMi45NS0xLjY0LTEuMDQtMi45Ny0xLjA0LTIuMzIuMzUtMi45NiwxLjA0Yy0uNjUuNy0uOTcsMS42OC0uOTcsMi45NXMuMzIsMi4yNy45NywyLjk2Yy42NS42OSwxLjY0LDEuMDQsMi45NiwxLjA0WiIgZmlsbD0iIzZkNmU3MSIvPgogICAgICA8cGF0aCBkPSJNMTMxLjIsOTUuMDVoMy4xNnY2Ljg3YzAsLjk4LjIyLDEuNzEuNjgsMi4xOC40NS40NywxLjIxLjcxLDIuMjcuNzFzMS44MS0uMjQsMi4yNi0uNzFjLjQ1LS40Ny42Ny0xLjIuNjctMi4xOHYtNi44N2gzLjE1djYuODdjMCwuODctLjE0LDEuNjItLjQyLDIuMjUtLjI4LjYyLS42OCwxLjE0LTEuMjEsMS41NC0uNTIuNC0xLjE2LjctMS45Mi44OXMtMS42MS4yOC0yLjU1LjI4LTEuODItLjEtMi41Ny0uMjljLS43Ni0uMTktMS4zOS0uNDktMS45Mi0uOS0uNTItLjQtLjkyLS45Mi0xLjE5LTEuNTYtLjI3LS42NC0uNC0xLjM5LS40LTIuMjZ2LTYuODJaIiBmaWxsPSIjNmQ2ZTcxIi8+CiAgICAgIDxwYXRoIGQ9Ik0xNDYuMTcsOTUuMDVoNS4zNmMxLjE5LDAsMi4xNi4xMSwyLjkzLjMyczEuMzcuNDksMS44MS44MmMuNDQuMzQuNzQuNzIuOTEsMS4xMy4xNy40Mi4yNS44Mi4yNSwxLjIyLDAsLjc0LS4xOCwxLjM3LS41MywxLjg4LS4zNS41MS0uOTUuOTMtMS43OCwxLjI4bDMuMDcsNC45aC0zLjQxbC0yLjU0LTQuMzNoLTIuOTd2NC4zM2gtMy4xMXYtMTEuNTRaTTE1MS43NCwxMDAuMjZjLjQ5LDAsLjktLjA0LDEuMjMtLjEyLjMyLS4wOC41OC0uMTkuNzctLjM0LjE5LS4xNS4zMi0uMzIuMzktLjUzLjA3LS4yLjExLS40My4xMS0uNjgsMC0uMjEtLjA0LS40LS4xMy0uNTlzLS4yMy0uMzYtLjQzLS41Yy0uMjEtLjE1LS40OS0uMjYtLjg1LS4zNHMtLjgyLS4xMi0xLjM3LS4xMmgtMi4xOHYzLjIyaDIuNDZaIiBmaWxsPSIjNmQ2ZTcxIi8+CiAgICAgIDxwYXRoIGQ9Ik0xNjMuMzksOTUuMDVoMy41NmwyLjQ0LDguMDIsMi40OC03Ljk1aDMuMzVsMi41OCw3Ljk1LDIuMjktOC4wMmgzLjM5bC00LjExLDExLjU0aC0zLjA3bC0yLjgyLTguNTQtMi43Myw4LjU0aC0yLjk5bC00LjM2LTExLjU0WiIgZmlsbD0iIzZkNmU3MSIvPgogICAgICA8cGF0aCBkPSJNMTkxLjU0LDEwNi44OWMtMS4xMywwLTIuMTQtLjE0LTMuMDMtLjQyLS44OS0uMjgtMS42NS0uNjgtMi4yNy0xLjIxcy0xLjEtMS4xNi0xLjQzLTEuOTFjLS4zMy0uNzQtLjUtMS41OC0uNS0yLjUycy4xNy0xLjc4LjUtMi41Mi44MS0xLjM4LDEuNDQtMS45MWMuNjMtLjUzLDEuMzktLjkzLDIuMjgtMS4yMXMxLjg5LS40MiwzLjAxLS40MiwyLjE0LjE0LDMuMDMuNDIsMS42NC42OCwyLjI2LDEuMjFjLjYxLjUzLDEuMDgsMS4xNiwxLjQxLDEuOTFzLjQ5LDEuNTguNDksMi41Mi0uMTYsMS43OC0uNDgsMi41MmMtLjMyLjc0LS43OCwxLjM4LTEuNCwxLjkxcy0xLjM3LjkzLTIuMjYsMS4yMWMtLjg5LjI4LTEuOTEuNDItMy4wNS40MlpNMTkxLjUyLDEwNC44MmMxLjMzLDAsMi4zMi0uMzQsMi45Ny0xLjA0LjY1LS42OS45Ny0xLjY4Ljk3LTIuOTZzLS4zMy0yLjI2LS45Ny0yLjk1Yy0uNjUtLjctMS42NC0xLjA0LTIuOTctMS4wNHMtMi4zMi4zNS0yLjk2LDEuMDQtLjk3LDEuNjgtLjk3LDIuOTUuMzMsMi4yNy45NywyLjk2Yy42NS42OSwxLjY0LDEuMDQsMi45NiwxLjA0WiIgZmlsbD0iIzZkNmU3MSIvPgogICAgICA8cGF0aCBkPSJNMjAxLjMzLDk1LjA1aDUuMzZjMS4xOSwwLDIuMTYuMTEsMi45My4zMnMxLjM3LjQ5LDEuODEuODJjLjQ0LjM0Ljc0LjcyLjkxLDEuMTMuMTcuNDIuMjUuODIuMjUsMS4yMiwwLC43NC0uMTgsMS4zNy0uNTMsMS44OC0uMzUuNTEtLjk1LjkzLTEuNzgsMS4yOGwzLjA3LDQuOWgtMy40MWwtMi41NC00LjMzaC0yLjk3djQuMzNoLTMuMTF2LTExLjU0Wk0yMDYuOSwxMDAuMjZjLjQ5LDAsLjktLjA0LDEuMjMtLjEyLjMyLS4wOC41OC0uMTkuNzctLjM0LjE5LS4xNS4zMi0uMzIuMzktLjUzLjA3LS4yLjExLS40My4xMS0uNjgsMC0uMjEtLjA0LS40LS4xMy0uNTlzLS4yMy0uMzYtLjQzLS41Yy0uMjEtLjE1LS40OS0uMjYtLjg1LS4zNHMtLjgyLS4xMi0xLjM3LS4xMmgtMi4xOHYzLjIyaDIuNDZaIiBmaWxsPSIjNmQ2ZTcxIi8+CiAgICAgIDxwYXRoIGQ9Ik0yMTUuMTYsOTUuMDVoMy4xNnY5LjQ3aDcuMTZsLS4zNCwyLjA3aC05Ljk4di0xMS41NFoiIGZpbGw9IiM2ZDZlNzEiLz4KICAgICAgPHBhdGggZD0iTTIyNy41Miw5NS4wNWg1LjY2YzIuMzIsMCw0LjEyLjQ4LDUuNDEsMS40NHMxLjk0LDIuMzgsMS45NCw0LjI3YzAsLjk2LS4xOCwxLjgtLjU0LDIuNTItLjM2LjcyLS44OCwxLjMzLTEuNTYsMS44M3MtMS41Ljg3LTIuNDgsMS4xMi0yLjA4LjM3LTMuMy4zN2gtNS4xM3YtMTEuNTRaTTIzMi43MSwxMDQuNTRjLjgyLDAsMS41Mi0uMDksMi4xLS4yNy41OC0uMTgsMS4wNS0uNDMsMS40MS0uNzdzLjYyLS43My43OS0xLjE5Yy4xNy0uNDYuMjUtLjk3LjI1LTEuNTRzLS4wNy0xLjA3LS4yMi0xLjUzLS4zOC0uODQtLjcxLTEuMTZjLS4zMi0uMzEtLjc0LS41Ni0xLjI2LS43My0uNTItLjE3LTEuMTUtLjI2LTEuOS0uMjZoLTIuNXY3LjQ0aDIuMDNaIiBmaWxsPSIjNmQ2ZTcxIi8+CiAgICA8L2c+CiAgICA8cGF0aCBkPSJNMjU0LjQsNTAuOWMyLjMzLDAsNC4xNCwxLjgxLDQuMTQsNC4wN3MtMS44MSw0LjA5LTQuMTcsNC4wOS00LjE5LTEuNzktNC4xOS00LjA5LDEuODYtNC4wNyw0LjE5LTQuMDdoLjAzWk0yNTQuMzUsNTEuNzJjLTEuNzksMC0zLjEzLDEuNDYtMy4xMywzLjI1czEuMzQsMy4yNSwzLjE4LDMuMjVjMS43OS4wMiwzLjEtMS40NCwzLjEtMy4yNXMtMS4zMi0zLjI1LTMuMTMtMy4yNWgtLjAyWk0yNTMuNzMsNTcuMDhoLS45NHYtNC4wNGMuMzctLjA3Ljg5LS4xNSwxLjU2LS4xNS43NywwLDEuMTIuMTIsMS40MS4zMi4yMi4xNy40LjUuNC44NywwLC40Ny0uMzUuODItLjg0Ljk3di4wNWMuNC4xMi42Mi40NS43NC45OS4xMi42Mi4yLjg3LjMuOTloLTEuMDJjLS4xMi0uMTUtLjItLjUtLjMyLS45Ny0uMDctLjQ1LS4zMi0uNjUtLjg0LS42NWgtLjQ1djEuNjFaTTI1My43NSw1NC44aC40NWMuNTIsMCwuOTQtLjE3Ljk0LS42LDAtLjM3LS4yNy0uNjItLjg3LS42Mi0uMjUsMC0uNDIuMDItLjUyLjA1djEuMTdaIiBmaWxsPSIjN2YzZjk4Ii8+CiAgPC9nPgo8L3N2Zz4K" style="width:100%;height:auto;object-fit:contain;" alt="Andar Rewards"/></div>
+    </div>
+    <div class="ob-bottom">
+      <div class="ob-dots">
+        <div class="ob-dot"></div>
+        <div class="ob-dot inactive"></div>
+        <div class="ob-dot inactive"></div>
+      </div>
+      <div class="ob-title">Welcome to Andar Rewards</div>
+      <div class="ob-desc">Your premier destination for luxury gaming, dining, and unforgettable experiences.</div>
+      <button class="btn-yellow" onclick="go('s-auth')">Next →</button>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: AUTH ══════════ -->
+  <div class="screen" id="s-auth">
+    <div class="auth-logo">
+      <div class="auth-logo-box"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMiIgZGF0YS1uYW1lPSJMYXllciAyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNjMuODciIGhlaWdodD0iMTA3LjMiIHZpZXdCb3g9IjAgMCAyNjMuODcgMTA3LjMiPgogIDxnIGlkPSJMYXllcl8xLTIiIGRhdGEtbmFtZT0iTGF5ZXIgMSI+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTAsMTA0LjRjLjctLjExLDEuMjUtLjQ2LDEuNjYtMS4wNS40LS41OS43OS0xLjI3LDEuMTctMi4wMmwyMC43NS00NS45MmMuMzgtLjcuNzEtMS4zNSwxLjAxLTEuOTQuMy0uNTkuNDUtMS4xLjQ1LTEuNTQsMC0uNTQtLjE5LS45Mi0uNTctMS4xMy0uMzgtLjIyLS43OC0uMzgtMS4yMS0uNDl2LTEuNDZoMTMuNjd2MS40NmMtLjM4LjExLS43Ni4yNi0xLjEzLjQ1LS4zOC4xOS0uNTcuNTgtLjU3LDEuMTcsMCwuNDMuMDkuODYuMjgsMS4yOS4xOS40My40NywxLC44NSwxLjdsMTYuODIsMzIuOTJjLjI3LjU5LjYzLDEuMDIsMS4wOSwxLjI5LjQ2LjI3Ljk4LjU0LDEuNTguODF2MS40NmgtMTQuMjR2LTEuNDZjLjIyLDAsLjQ5LS4wOC44MS0uMjQuMzItLjE2LjQ5LS40LjQ5LS43MywwLS41NC0uMjItMS4yNC0uNjUtMi4xbC0zLjA3LTUuOThoLTE5Ljc0bC04LjY5LDIwLjJjLS41NCwxLjEzLS44MSwxLjk0LS44MSwyLjQzLDAsLjU5LjUxLjg5LDEuNTQuODl2MS40Nkgwdi0xLjQ2Wk0zNi4yOCw3NC45bC02Ljc5LTE1LjA0LTcuNiwxNS4wNGgxNC40WiIgZmlsbD0iIzdmM2Y5OCIvPgogICAgICA8cGF0aCBkPSJNNTYuNSw4OS45NWMxLjAyLDAsMS41NC0uNDksMS41NC0xLjQ2di0zNi43MmMwLS45Ny0uNTEtMS40Ni0xLjU0LTEuNDZ2LTEuNDZoMTMuODN2MS40NmMtLjQzLDAtLjY1LjI3LS42NS44MSwwLC40My41NCwxLjE5LDEuNjIsMi4yN2wyMy4yMSwyNC4xVjI1Ljc1YzAtLjk3LS43LTEuNDYtMi4xLTEuNDZ2LTEuNDZoMTIuMjF2MS40NmMtMS4wMiwwLTEuNTQuNDktMS41NCwxLjQ2djYyLjc0YzAsLjk3LjUxLDEuNDYsMS41NCwxLjQ2djEuNDZoLTEzLjF2LTEuNDZjLjcsMCwxLjA1LS4yNCwxLjA1LS43MywwLS4zOC0uNDMtMS0xLjI5LTEuODZsLTI0LjY3LTI1LjcydjI2Ljg1YzAsLjk3LjYyLDEuNDYsMS44NiwxLjQ2djEuNDZoLTExLjk3di0xLjQ2WiIgZmlsbD0iIzdmM2Y5OCIvPgogICAgICA8cGF0aCBkPSJNMTM2LjAxLDQ4Ljg2YzIuOTYsMCw1LjczLjQzLDguMjksMS4yOSwyLjU2Ljg2LDQuNzgsMi4xNyw2LjY3LDMuOTIsMS44OSwxLjc1LDMuMzcsMy45Niw0LjQ1LDYuNjMsMS4wOCwyLjY3LDEuNjIsNS44MSwxLjYyLDkuNDJzLS41NCw2Ljc1LTEuNjIsOS40MmMtMS4wOCwyLjY3LTIuNTYsNC44OC00LjQ1LDYuNjMtMS44OSwxLjc1LTQuMTEsMy4wNi02LjY3LDMuOTItMi41Ni44Ni01LjMzLDEuMjktOC4yOSwxLjI5aC0yNi44NXYtMS40NmMxLjI0LDAsMS44Ni0uNDksMS44Ni0xLjQ2di0zNi43MmMwLS45Ny0uNjItMS40Ni0xLjg2LTEuNDZ2LTEuNDZoMjYuODVaTTEzMi43Nyw4NC40NWMyLjUzLDAsNC43NC0uMjIsNi42My0uNjUsMS44OS0uNDMsMy40NS0xLjIsNC42OS0yLjMsMS4yNC0xLjEsMi4xNy0yLjU3LDIuNzktNC40MS42Mi0xLjgzLjkzLTQuMTUuOTMtNi45NnMtLjMxLTUuMTItLjkzLTYuOTZjLS42Mi0xLjgzLTEuNTUtMy4zLTIuNzktNC40MS0xLjI0LTEuMS0yLjgtMS44Ny00LjY5LTIuMy0xLjg5LS40My00LjEtLjY1LTYuNjMtLjY1aC0xMi41NHYyOC42M2gxMi41NFoiIGZpbGw9IiM3ZjNmOTgiLz4KICAgICAgPHBhdGggZD0iTTE1NC4zNyw4OS45NWMuNy0uMTEsMS4yNS0uNDYsMS42Ni0xLjA1LjQtLjU5Ljc5LTEuMjcsMS4xNy0yLjAybDE0Ljk2LTMxLjQ2Yy4zOC0uNy43MS0xLjM1LDEuMDEtMS45NC4zLS41OS40NS0xLjEuNDUtMS41NCwwLS41NC0uMTktLjkyLS41Ny0xLjEzLS4zOC0uMjItLjc4LS4zOC0xLjIxLS40OXYtMS40NmgxMy42N3YxLjQ2Yy0uMzguMTEtLjc2LjI2LTEuMTMuNDUtLjM4LjE5LS41Ny41OC0uNTcsMS4xNywwLC40My4wOS44Ni4yOCwxLjI5LjE5LjQzLjQ3LDEsLjg1LDEuN2wxNi44MiwzMi45MmMuMjcuNTkuNjMsMS4wMiwxLjA5LDEuMjkuNDYuMjcuOTguNTQsMS41OC44MXYxLjQ2aC0xNC4yNHYtMS40NmMuMjIsMCwuNDktLjA4LjgxLS4yNC4zMi0uMTYuNDktLjQuNDktLjczLDAtLjU0LS4yMi0xLjI0LS42NS0yLjFsLTMuMDctNS45OGgtMTkuNzRsLTIuOTEsNS43NGMtLjU0LDEuMTMtLjgxLDEuOTQtLjgxLDIuNDMsMCwuNTkuNTEuODksMS41NC44OXYxLjQ2aC0xMS40OXYtMS40NlpNMTg0Ljg2LDc0LjlsLTYuNzktMTUuMDQtNy42LDE1LjA0aDE0LjRaIiBmaWxsPSIjN2YzZjk4Ii8+CiAgICAgIDxwYXRoIGQ9Ik0yMzEuODUsNDguODZjMi41OSwwLDQuOTMuMjMsNy4wNC42OSwyLjEuNDYsMy45MSwxLjE5LDUuNDIsMi4xOCwxLjUxLDEsMi42NywyLjI5LDMuNDgsMy44OC44MSwxLjU5LDEuMjEsMy41NSwxLjIxLDUuODYsMCwzLjU2LTEuMDUsNi4yOC0zLjE1LDguMTctMi4xLDEuODktNC45MywzLjE1LTguNDksMy44bDIzLjc3LDMxLjI3Yy4zOC41NC44Mi44NiwxLjMzLjk3LjUxLjExLjk4LjE2LDEuNDIuMTZ2MS40NmgtMTUuMTN2LTEuNDZjLjQ5LDAsLjktLjA4LDEuMjUtLjI0LjM1LS4xNi41My0uMzguNTMtLjY1cy0uMTEtLjU4LS4zMi0uOTNjLS4yMi0uMzUtLjU0LS44Mi0uOTctMS40MmwtMjEuOTEtMjguNTJoLTExLjU3djE0LjRjMCwuNDkuMTcuODUuNTMsMS4wOS4zNS4yNC45OC4zNiwxLjkuMzZ2MS40NmgtMTMuOTl2LTEuNDZjMS41NiwwLDIuMzUtLjQ5LDIuMzUtMS40NnYtMzYuNzJjMC0uOTctLjc4LTEuNDYtMi4zNS0xLjQ2di0xLjQ2aDI3LjY2Wk0yMjkuNzUsNjcuNzhjMS45NCwwLDMuNTYtLjE1LDQuODUtLjQ1LDEuMjktLjMsMi4zMi0uNzEsMy4wNy0xLjI1Ljc1LS41NCwxLjI5LTEuMTcsMS42Mi0xLjkuMzItLjczLjQ5LTEuNTIuNDktMi4zOXMtLjE2LTEuNjYtLjQ5LTIuMzljLS4zMi0uNzMtLjg2LTEuMzYtMS42Mi0xLjktLjc2LS41NC0xLjc4LS45Ni0zLjA3LTEuMjUtMS4yOS0uMy0yLjkxLS40NS00Ljg1LS40NWgtMTMuOTl2MTEuOTdoMTMuOTlaIiBmaWxsPSIjN2YzZjk4Ii8+CiAgICA8L2c+CiAgICA8cGF0aCBkPSJNMTc5LjQsMzYuNzljMTIsMCwyMi44MiwzLjQyLDMwLjQ1LDguODlsMTcuNDgtMjMuNzNjLTQuNzgsMy40NS0xMC41NCw1LjQ2LTE2Ljc0LDUuNDYtMTUuMDgsMC0yOS4xMS0xMS45MS0zMS4xOS0yNy40LTIuMDgsMTUuNDktMTYuMSwyNy40LTMxLjE4LDI3LjQtNi4yLDAtMTEuOTYtMi4wMS0xNi43NC01LjQ2bDE3LjQ4LDIzLjczYzcuNjMtNS40NywxOC40NS04Ljg5LDMwLjQ1LTguODlaIiBmaWxsPSIjZmZkZTE3Ii8+CiAgICA8Zz4KICAgICAgPHBhdGggZD0iTTQ0LjA1LDk1LjA1aDUuMzZjMS4xOSwwLDIuMTYuMTEsMi45My4zMnMxLjM3LjQ5LDEuODEuODJjLjQ0LjM0Ljc0LjcyLjkxLDEuMTMuMTcuNDIuMjUuODIuMjUsMS4yMiwwLC43NC0uMTgsMS4zNy0uNTMsMS44OC0uMzUuNTEtLjk1LjkzLTEuNzgsMS4yOGwzLjA3LDQuOWgtMy40MWwtMi41NC00LjMzaC0yLjk2djQuMzNoLTMuMTF2LTExLjU0Wk00OS42MiwxMDAuMjZjLjQ5LDAsLjktLjA0LDEuMjMtLjEyLjMyLS4wOC41OC0uMTkuNzctLjM0LjE5LS4xNS4zMi0uMzIuMzktLjUzLjA3LS4yLjExLS40My4xMS0uNjgsMC0uMjEtLjA0LS40LS4xMy0uNTktLjA4LS4xOS0uMjMtLjM2LS40My0uNS0uMi0uMTUtLjQ5LS4yNi0uODUtLjM0cy0uODItLjEyLTEuMzctLjEyaC0yLjE4djMuMjJoMi40NloiIGZpbGw9IiM2ZDZlNzEiLz4KICAgICAgPHBhdGggZD0iTTU3LjU4LDk1LjA1aDMuMTZ2Ni44N2MwLC45OC4yMywxLjcxLjY4LDIuMTguNDUuNDcsMS4yMS43MSwyLjI3LjcxczEuODEtLjI0LDIuMjYtLjcxYy40NC0uNDcuNjctMS4yLjY3LTIuMTh2LTYuODdoMy4xNnY2Ljg3YzAsLjg3LS4xNCwxLjYyLS40MiwyLjI1LS4yOC42Mi0uNjksMS4xNC0xLjIxLDEuNTRzLTEuMTYuNy0xLjkyLjg5Yy0uNzYuMTktMS42MS4yOC0yLjU1LjI4cy0xLjgyLS4xLTIuNTctLjI5Yy0uNzYtLjE5LTEuMzktLjQ5LTEuOTItLjlzLS45Mi0uOTItMS4xOS0xLjU2Yy0uMjctLjY0LS40LTEuMzktLjQtMi4yNnYtNi44MloiIGZpbGw9IiM2ZDZlNzEiLz4KICAgICAgPHBhdGggZD0iTTcyLjU2LDk1LjA1aDMuMTZ2OS40N2g3LjE2bC0uMzQsMi4wN2gtOS45OHYtMTEuNTRaIiBmaWxsPSIjNmQ2ZTcxIi8+CiAgICAgIDxwYXRoIGQ9Ik04NC45Miw5NS4wNWgxMC4zMXYyLjA1aC03LjE2djIuNTJoNi43NHYyLjA3aC02Ljc0djIuODRoNy42bC0uMzIsMi4wNWgtMTAuNDR2LTExLjU0WiIgZmlsbD0iIzZkNmU3MSIvPgogICAgICA8cGF0aCBkPSJNMTA2LjM0LDEwMS44OWwtNS4yMy02Ljg0aDMuNTJsMy4yNiw0LjY3LDMuMzctNC42N2gzLjM1bC01LjEsNi44NHY0LjcxaC0zLjE2di00LjcxWiIgZmlsbD0iIzZkNmU3MSIvPgogICAgICA8cGF0aCBkPSJNMTIxLjcxLDEwNi44OWMtMS4xMywwLTIuMTQtLjE0LTMuMDMtLjQyLS44OS0uMjgtMS42NS0uNjgtMi4yNy0xLjIxLS42Mi0uNTMtMS4xLTEuMTYtMS40My0xLjkxLS4zMy0uNzQtLjUtMS41OC0uNS0yLjUycy4xNy0xLjc4LjUtMi41MmMuMzMtLjc0LjgxLTEuMzgsMS40NC0xLjkxLjYzLS41MywxLjM5LS45MywyLjI4LTEuMjEuODktLjI4LDEuODktLjQyLDMuMDEtLjQyczIuMTQuMTQsMy4wMy40MmMuODkuMjgsMS42NC42OCwyLjI2LDEuMjEuNjEuNTMsMS4wOCwxLjE2LDEuNDEsMS45MS4zMi43NC40OSwxLjU4LjQ5LDIuNTJzLS4xNiwxLjc4LS40OCwyLjUyYy0uMzIuNzQtLjc4LDEuMzgtMS40LDEuOTEtLjYxLjUzLTEuMzcuOTMtMi4yNiwxLjIxLS44OS4yOC0xLjkxLjQyLTMuMDUuNDJaTTEyMS42OSwxMDQuODJjMS4zMywwLDIuMzItLjM0LDIuOTctMS4wNC42NS0uNjkuOTctMS42OC45Ny0yLjk2cy0uMzItMi4yNi0uOTctMi45NS0xLjY0LTEuMDQtMi45Ny0xLjA0LTIuMzIuMzUtMi45NiwxLjA0Yy0uNjUuNy0uOTcsMS42OC0uOTcsMi45NXMuMzIsMi4yNy45NywyLjk2Yy42NS42OSwxLjY0LDEuMDQsMi45NiwxLjA0WiIgZmlsbD0iIzZkNmU3MSIvPgogICAgICA8cGF0aCBkPSJNMTMxLjIsOTUuMDVoMy4xNnY2Ljg3YzAsLjk4LjIyLDEuNzEuNjgsMi4xOC40NS40NywxLjIxLjcxLDIuMjcuNzFzMS44MS0uMjQsMi4yNi0uNzFjLjQ1LS40Ny42Ny0xLjIuNjctMi4xOHYtNi44N2gzLjE1djYuODdjMCwuODctLjE0LDEuNjItLjQyLDIuMjUtLjI4LjYyLS42OCwxLjE0LTEuMjEsMS41NC0uNTIuNC0xLjE2LjctMS45Mi44OXMtMS42MS4yOC0yLjU1LjI4LTEuODItLjEtMi41Ny0uMjljLS43Ni0uMTktMS4zOS0uNDktMS45Mi0uOS0uNTItLjQtLjkyLS45Mi0xLjE5LTEuNTYtLjI3LS42NC0uNC0xLjM5LS40LTIuMjZ2LTYuODJaIiBmaWxsPSIjNmQ2ZTcxIi8+CiAgICAgIDxwYXRoIGQ9Ik0xNDYuMTcsOTUuMDVoNS4zNmMxLjE5LDAsMi4xNi4xMSwyLjkzLjMyczEuMzcuNDksMS44MS44MmMuNDQuMzQuNzQuNzIuOTEsMS4xMy4xNy40Mi4yNS44Mi4yNSwxLjIyLDAsLjc0LS4xOCwxLjM3LS41MywxLjg4LS4zNS41MS0uOTUuOTMtMS43OCwxLjI4bDMuMDcsNC45aC0zLjQxbC0yLjU0LTQuMzNoLTIuOTd2NC4zM2gtMy4xMXYtMTEuNTRaTTE1MS43NCwxMDAuMjZjLjQ5LDAsLjktLjA0LDEuMjMtLjEyLjMyLS4wOC41OC0uMTkuNzctLjM0LjE5LS4xNS4zMi0uMzIuMzktLjUzLjA3LS4yLjExLS40My4xMS0uNjgsMC0uMjEtLjA0LS40LS4xMy0uNTlzLS4yMy0uMzYtLjQzLS41Yy0uMjEtLjE1LS40OS0uMjYtLjg1LS4zNHMtLjgyLS4xMi0xLjM3LS4xMmgtMi4xOHYzLjIyaDIuNDZaIiBmaWxsPSIjNmQ2ZTcxIi8+CiAgICAgIDxwYXRoIGQ9Ik0xNjMuMzksOTUuMDVoMy41NmwyLjQ0LDguMDIsMi40OC03Ljk1aDMuMzVsMi41OCw3Ljk1LDIuMjktOC4wMmgzLjM5bC00LjExLDExLjU0aC0zLjA3bC0yLjgyLTguNTQtMi43Myw4LjU0aC0yLjk5bC00LjM2LTExLjU0WiIgZmlsbD0iIzZkNmU3MSIvPgogICAgICA8cGF0aCBkPSJNMTkxLjU0LDEwNi44OWMtMS4xMywwLTIuMTQtLjE0LTMuMDMtLjQyLS44OS0uMjgtMS42NS0uNjgtMi4yNy0xLjIxcy0xLjEtMS4xNi0xLjQzLTEuOTFjLS4zMy0uNzQtLjUtMS41OC0uNS0yLjUycy4xNy0xLjc4LjUtMi41Mi44MS0xLjM4LDEuNDQtMS45MWMuNjMtLjUzLDEuMzktLjkzLDIuMjgtMS4yMXMxLjg5LS40MiwzLjAxLS40MiwyLjE0LjE0LDMuMDMuNDIsMS42NC42OCwyLjI2LDEuMjFjLjYxLjUzLDEuMDgsMS4xNiwxLjQxLDEuOTFzLjQ5LDEuNTguNDksMi41Mi0uMTYsMS43OC0uNDgsMi41MmMtLjMyLjc0LS43OCwxLjM4LTEuNCwxLjkxcy0xLjM3LjkzLTIuMjYsMS4yMWMtLjg5LjI4LTEuOTEuNDItMy4wNS40MlpNMTkxLjUyLDEwNC44MmMxLjMzLDAsMi4zMi0uMzQsMi45Ny0xLjA0LjY1LS42OS45Ny0xLjY4Ljk3LTIuOTZzLS4zMy0yLjI2LS45Ny0yLjk1Yy0uNjUtLjctMS42NC0xLjA0LTIuOTctMS4wNHMtMi4zMi4zNS0yLjk2LDEuMDQtLjk3LDEuNjgtLjk3LDIuOTUuMzMsMi4yNy45NywyLjk2Yy42NS42OSwxLjY0LDEuMDQsMi45NiwxLjA0WiIgZmlsbD0iIzZkNmU3MSIvPgogICAgICA8cGF0aCBkPSJNMjAxLjMzLDk1LjA1aDUuMzZjMS4xOSwwLDIuMTYuMTEsMi45My4zMnMxLjM3LjQ5LDEuODEuODJjLjQ0LjM0Ljc0LjcyLjkxLDEuMTMuMTcuNDIuMjUuODIuMjUsMS4yMiwwLC43NC0uMTgsMS4zNy0uNTMsMS44OC0uMzUuNTEtLjk1LjkzLTEuNzgsMS4yOGwzLjA3LDQuOWgtMy40MWwtMi41NC00LjMzaC0yLjk3djQuMzNoLTMuMTF2LTExLjU0Wk0yMDYuOSwxMDAuMjZjLjQ5LDAsLjktLjA0LDEuMjMtLjEyLjMyLS4wOC41OC0uMTkuNzctLjM0LjE5LS4xNS4zMi0uMzIuMzktLjUzLjA3LS4yLjExLS40My4xMS0uNjgsMC0uMjEtLjA0LS40LS4xMy0uNTlzLS4yMy0uMzYtLjQzLS41Yy0uMjEtLjE1LS40OS0uMjYtLjg1LS4zNHMtLjgyLS4xMi0xLjM3LS4xMmgtMi4xOHYzLjIyaDIuNDZaIiBmaWxsPSIjNmQ2ZTcxIi8+CiAgICAgIDxwYXRoIGQ9Ik0yMTUuMTYsOTUuMDVoMy4xNnY5LjQ3aDcuMTZsLS4zNCwyLjA3aC05Ljk4di0xMS41NFoiIGZpbGw9IiM2ZDZlNzEiLz4KICAgICAgPHBhdGggZD0iTTIyNy41Miw5NS4wNWg1LjY2YzIuMzIsMCw0LjEyLjQ4LDUuNDEsMS40NHMxLjk0LDIuMzgsMS45NCw0LjI3YzAsLjk2LS4xOCwxLjgtLjU0LDIuNTItLjM2LjcyLS44OCwxLjMzLTEuNTYsMS44M3MtMS41Ljg3LTIuNDgsMS4xMi0yLjA4LjM3LTMuMy4zN2gtNS4xM3YtMTEuNTRaTTIzMi43MSwxMDQuNTRjLjgyLDAsMS41Mi0uMDksMi4xLS4yNy41OC0uMTgsMS4wNS0uNDMsMS40MS0uNzdzLjYyLS43My43OS0xLjE5Yy4xNy0uNDYuMjUtLjk3LjI1LTEuNTRzLS4wNy0xLjA3LS4yMi0xLjUzLS4zOC0uODQtLjcxLTEuMTZjLS4zMi0uMzEtLjc0LS41Ni0xLjI2LS43My0uNTItLjE3LTEuMTUtLjI2LTEuOS0uMjZoLTIuNXY3LjQ0aDIuMDNaIiBmaWxsPSIjNmQ2ZTcxIi8+CiAgICA8L2c+CiAgICA8cGF0aCBkPSJNMjU0LjQsNTAuOWMyLjMzLDAsNC4xNCwxLjgxLDQuMTQsNC4wN3MtMS44MSw0LjA5LTQuMTcsNC4wOS00LjE5LTEuNzktNC4xOS00LjA5LDEuODYtNC4wNyw0LjE5LTQuMDdoLjAzWk0yNTQuMzUsNTEuNzJjLTEuNzksMC0zLjEzLDEuNDYtMy4xMywzLjI1czEuMzQsMy4yNSwzLjE4LDMuMjVjMS43OS4wMiwzLjEtMS40NCwzLjEtMy4yNXMtMS4zMi0zLjI1LTMuMTMtMy4yNWgtLjAyWk0yNTMuNzMsNTcuMDhoLS45NHYtNC4wNGMuMzctLjA3Ljg5LS4xNSwxLjU2LS4xNS43NywwLDEuMTIuMTIsMS40MS4zMi4yMi4xNy40LjUuNC44NywwLC40Ny0uMzUuODItLjg0Ljk3di4wNWMuNC4xMi42Mi40NS43NC45OS4xMi42Mi4yLjg3LjMuOTloLTEuMDJjLS4xMi0uMTUtLjItLjUtLjMyLS45Ny0uMDctLjQ1LS4zMi0uNjUtLjg0LS42NWgtLjQ1djEuNjFaTTI1My43NSw1NC44aC40NWMuNTIsMCwuOTQtLjE3Ljk0LS42LDAtLjM3LS4yNy0uNjItLjg3LS42Mi0uMjUsMC0uNDIuMDItLjUyLjA1djEuMTdaIiBmaWxsPSIjN2YzZjk4Ii8+CiAgPC9nPgo8L3N2Zz4K" style="width:65px;object-fit:contain;padding:4px;" alt="Andar Rewards"/></div>
+      <div class="auth-tagline">Earn points every minute you're on property</div>
+    </div>
+    <div class="auth-sheet">
+      <h2>Get Started</h2>
+      <p>Sign in to redeem rewards, or start earning right away — no account needed.</p>
+      <button class="btn-yellow" onclick="go('s-register')">Create Account</button>
+      <div class="auth-divider"><span>already a member?</span></div>
+      <button class="btn-outline" onclick="go('s-home')">Sign In</button>
+      <div class="earn-banner" onclick="go('s-home')">
+        <div class="earn-banner-icon">⚡</div>
+        <div class="earn-banner-text">
+          <strong>Start earning without signing up</strong>
+          <span>Register later to unlock your earned points</span>
+        </div>
+        <div class="earn-banner-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: REGISTER ══════════ -->
+  <div class="screen" id="s-register" style="background:var(--bg);">
+    <div class="hdr">
+      <div class="hdr-row">
+        <button class="back-btn" onclick="go('s-auth')">←</button>
+        <div>
+          <div class="hdr-title">Create your account</div>
+          <div class="hdr-sub">Join and start earning points today</div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll">
+      <div class="bonus-card">
+        <div class="bonus-icon">🎁</div>
+        <div class="bonus-text">
+          <strong>Registration bonus: +500 pts</strong>
+          <span>Create your account and link your player card to claim 500 bonus points instantly.</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" placeholder="Alex Johnson"/>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" placeholder="alex@example.com"/>
+      </div>
+      <div class="field">
+        <label>Phone</label>
+        <input type="tel" placeholder="+1 (555) 000-0000"/>
+      </div>
+      <div class="card-link-field">
+        <div style="font-size:24px">🃏</div>
+        <div class="card-link-text">
+          <strong>Link Player Card (optional)</strong>
+          <span>Connect your casino card to sync your balance and earn +200 bonus pts</span>
+        </div>
+        <div class="card-link-arrow">›</div>
+      </div>
+      <button class="btn-yellow" onclick="go('s-home')" style="margin-bottom:12px">Create Account</button>
+      <p style="text-align:center;font-size:12px;color:var(--text-soft)">By creating an account you agree to our <span style="color:var(--purple);font-weight:500">Terms & Privacy Policy</span></p>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: HOME ══════════ -->
+  <div class="screen" id="s-home" style="background:var(--bg);">
+    <div class="home-hdr">
+      <div class="home-hdr-top">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="home-avatar">A</div>
+          <div>
+            <div class="home-welcome">Welcome back,</div>
+            <div class="home-name">Alex</div>
+          </div>
+        </div>
+        <button class="notif-btn" onclick="go('s-notifications')">
+          🔔
+          <span class="nav-badge">3</span>
+        </button>
+      </div>
+      <!-- Dual Balance Card -->
+      <div class="balance-card">
+        <div class="balance-row">
+          <div class="balance-col">
+            <div class="balance-label">App Points</div>
+            <div class="balance-amount">3 240 <span class="balance-unit">pts</span></div>
+            <div class="balance-source">
+              <span class="dot" style="background:var(--purple)"></span>
+              Andar Rewards
+            </div>
+          </div>
+          <div class="balance-divider"></div>
+          <div class="balance-col" style="padding-left:12px">
+            <div class="balance-label">Casino Balance</div>
+            <div class="balance-amount" style="font-size:22px;color:var(--text)">1 850 <span class="balance-unit">pts</span></div>
+            <div class="balance-source">
+              <span class="dot" style="background:var(--yellow)"></span>
+              TableTrack CMS
+            </div>
+          </div>
+        </div>
+        <div class="tier-row">
+          <span class="tier-badge">⭐ Silver</span>
+          <span class="tier-progress-text">1 760 pts to Gold</span>
+        </div>
+        <div class="progress-wrap-home"><div class="progress-fill-home"></div></div>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <!-- Jackpot Button -->
+      <button class="jackpot-btn" onclick="showModal('modal-jackpot')">
+        <div class="jackpot-icon">🎰</div>
+        <div class="jackpot-text">
+          <strong>Jackpot! Notify Host</strong>
+          <span>Instant alert to your casino host</span>
+        </div>
+        <div class="jackpot-arrow">›</div>
+      </button>
+
+      <!-- Active Stay -->
+      <div class="active-stay">
+        <div class="stay-hdr">
+          <span class="stay-title">Active Stay</span>
+          <span class="stay-live"><span class="live-dot"></span> Points running...</span>
+        </div>
+        <div class="stay-row">
+          <div class="stay-info">
+            <label>Check-in</label>
+            <strong>Today, 2:00 PM</strong>
+          </div>
+          <div class="stay-rate">
+            <label>Rate</label>
+            <strong>+1 pt / min</strong>
+          </div>
+        </div>
+        <button class="track-btn" onclick="go('s-casinopts')">Track Casino Points</button>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="card">
+        <div class="section-hdr">
+          <span class="section-title">Recent Activity</span>
+          <span class="section-link" onclick="go('s-history')">See all ›</span>
+        </div>
+        <div class="tx-item">
+          <div class="tx-icon earn">📈</div>
+          <div><div class="tx-label">Casino — 3 hrs</div><div class="tx-date">2026-03-03</div></div>
+          <div class="tx-amount earn">+180 pts</div>
+        </div>
+        <div class="tx-item">
+          <div class="tx-icon spend">📉</div>
+          <div><div class="tx-label">Redeemed: Dinner for 2</div><div class="tx-date">2026-03-02</div></div>
+          <div class="tx-amount spend">−800 pts</div>
+        </div>
+        <div class="tx-item">
+          <div class="tx-icon earn">📈</div>
+          <div><div class="tx-label">Casino — 2 hrs</div><div class="tx-date">2026-03-01</div></div>
+          <div class="tx-amount earn">+120 pts</div>
+        </div>
+        <div class="tx-item" style="border:none">
+          <div class="tx-icon earn">📈</div>
+          <div><div class="tx-label">Hotel Stay — 2 nights</div><div class="tx-date">2026-02-28</div></div>
+          <div class="tx-amount earn">+500 pts</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn active" onclick="go('s-home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+      <button class="nav-btn" onclick="go('s-rewards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Rewards</button>
+      <button class="nav-btn nav-msg-center" onclick="go('s-messages')">
+        <div class="nav-msg-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <span style="color:var(--purple);font-weight:600">Messages</span>
+        <span class="nav-badge" style="top:4px;right:calc(50% - 20px)">2</span>
+      </button>
+      <button class="nav-btn" onclick="go('s-offers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Offers</button>
+      <button class="nav-btn" onclick="go('s-account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Account</button>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: CASINO POINTS ══════════ -->
+  <div class="screen" id="s-casinopts" style="background:var(--bg);">
+    <div class="hdr">
+      <div class="hdr-row">
+        <button class="back-btn" onclick="go('s-home')">←</button>
+        <div class="hdr-title">Casino Points</div>
+      </div>
+    </div>
+    <div class="scroll">
+      <div class="card" style="border:1.5px solid var(--border)">
+        <div style="font-size:28px;margin-bottom:10px">📍</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px">Andar Rewards wants to use your location</div>
+        <div style="font-size:13px;color:var(--text-mid);line-height:1.6;margin-bottom:20px">Your location is used to detect when you're on Andar property and automatically earn points for every minute of your visit.</div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-outline" style="flex:1;padding:13px">Deny</button>
+          <button class="btn-yellow" style="flex:1;padding:13px" onclick="showLiveTracking()">Allow</button>
+        </div>
+      </div>
+
+      <div class="card" id="live-tracking-card" style="display:none;border:2px solid var(--green)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <span class="live-dot"></span>
+          <span style="font-size:13px;font-weight:600;color:var(--green)">Actively earning points</span>
+        </div>
+        <div style="font-size:36px;font-weight:800;color:var(--purple);margin-bottom:4px" id="live-counter">3 240</div>
+        <div style="font-size:13px;color:var(--text-soft)">Total app points</div>
+        <hr class="divider">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:13px;color:var(--text-mid)">Session duration</span>
+          <span style="font-size:14px;font-weight:600;color:var(--text)" id="session-timer">0:00</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+          <span style="font-size:13px;color:var(--text-mid)">Earning rate</span>
+          <span style="font-size:14px;font-weight:600;color:var(--purple)">+1 pt / min</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+          <span style="font-size:13px;color:var(--text-mid)">Earned this session</span>
+          <span style="font-size:14px;font-weight:700;color:var(--green)" id="session-pts">+0 pts</span>
+        </div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn" onclick="go('s-home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+      <button class="nav-btn" onclick="go('s-rewards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Rewards</button>
+      <button class="nav-btn nav-msg-center" onclick="go('s-messages')"><div class="nav-msg-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span style="color:var(--purple);font-weight:600">Messages</span></button>
+      <button class="nav-btn" onclick="go('s-offers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Offers</button>
+      <button class="nav-btn" onclick="go('s-account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Account</button>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: MESSAGES ══════════ -->
+  <div class="screen" id="s-messages" style="background:var(--bg);display:flex;flex-direction:column;">
+    <div class="msg-hdr">
+      <div class="msg-hdr-title">💬 Messages</div>
+      <div class="msg-hdr-sub">Stay connected with your casino host</div>
+    </div>
+    <div class="scroll" style="flex:1">
+      <!-- Jackpot CTA -->
+      <button class="jackpot-cta" onclick="showModal('modal-jackpot')">
+        <div class="jackpot-cta-icon">🎰</div>
+        <div class="jackpot-cta-body">
+          <strong>🚨 JACKPOT!</strong>
+          <span>Tap to instantly alert your host. They'll be with you right away.</span>
+        </div>
+        <div class="jackpot-cta-arrow">›</div>
+      </button>
+
+      <!-- Contact Host -->
+      <div class="contact-host" onclick="showModal('modal-contact')">
+        <div class="contact-host-icon">🙋</div>
+        <div class="contact-host-text">
+          <strong>Contact a Host</strong>
+          <span>Request assistance, make inquiries, or ask for help</span>
+        </div>
+        <div class="contact-host-arrow">›</div>
+      </div>
+
+      <!-- Message threads -->
+      <div class="msg-section">From Your Hosts</div>
+
+      <div class="msg-thread">
+        <div class="msg-avatar">M</div>
+        <div class="msg-thread-body">
+          <div class="msg-thread-top">
+            <span class="msg-thread-name">Michael — VIP Host</span>
+            <span class="msg-thread-time">2:14 PM</span>
+          </div>
+          <div class="msg-thread-preview" style="color:var(--text);font-weight:500">Welcome back, Alex! Your Gold upgrade...</div>
+        </div>
+        <div class="msg-unread-dot"></div>
+      </div>
+
+      <div class="msg-thread">
+        <div class="msg-avatar" style="background:var(--purple-mid)">S</div>
+        <div class="msg-thread-body">
+          <div class="msg-thread-top">
+            <span class="msg-thread-name">Sara — Dining Concierge</span>
+            <span class="msg-thread-time">Yesterday</span>
+          </div>
+          <div class="msg-thread-preview">Your Azure reservation is confirmed for 7 PM</div>
+        </div>
+        <div class="msg-unread-dot"></div>
+      </div>
+
+      <div class="msg-thread" style="opacity:.6">
+        <div class="msg-avatar" style="background:#888">A</div>
+        <div class="msg-thread-body">
+          <div class="msg-thread-top">
+            <span class="msg-thread-name">Andar Rewards</span>
+            <span class="msg-thread-time">Mar 3</span>
+          </div>
+          <div class="msg-thread-preview">You've earned 180 points from your last visit!</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn" onclick="go('s-home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+      <button class="nav-btn" onclick="go('s-rewards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Rewards</button>
+      <button class="nav-btn nav-msg-center active" onclick="go('s-messages')"><div class="nav-msg-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span style="color:var(--purple);font-weight:600">Messages</span></button>
+      <button class="nav-btn" onclick="go('s-offers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Offers</button>
+      <button class="nav-btn" onclick="go('s-account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Account</button>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: REWARDS ══════════ -->
+  <div class="screen" id="s-rewards" style="background:var(--bg);">
+    <div class="hdr">
+      <div class="hdr-row">
+        <button class="back-btn" onclick="go('s-home')">←</button>
+        <div class="hdr-title">Rewards</div>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:14px;padding:12px 16px;margin-top:12px">
+        <div style="font-size:11px;color:rgba(255,255,255,.6)">Available Balance</div>
+        <div style="font-size:26px;font-weight:700;color:white">3 240 <span style="font-size:16px;font-weight:400;opacity:.7">pts</span></div>
+      </div>
+    </div>
+    <div class="scroll">
+      <div class="pills">
+        <div class="pill active">All</div>
+        <div class="pill">Dining</div>
+        <div class="pill">Rooms</div>
+        <div class="pill">Spa</div>
+        <div class="pill">Casino</div>
+      </div>
+      <div class="rewards-grid">
+        <div class="reward-card"><div class="reward-img">🍽️</div><div class="reward-body"><div class="reward-name">Dinner for 2 at Azure</div><div class="reward-pts">800 pts</div><button class="reward-btn" onclick="showModal('modal-redeem')">Redeem</button></div></div>
+        <div class="reward-card"><div class="reward-img">🥐</div><div class="reward-body"><div class="reward-name">Breakfast Buffet</div><div class="reward-pts">300 pts</div><button class="reward-btn" onclick="showModal('modal-redeem')">Redeem</button></div></div>
+        <div class="reward-card"><div class="reward-img">🍸</div><div class="reward-body"><div class="reward-name">Cocktail Hour</div><div class="reward-pts">200 pts</div><button class="reward-btn" onclick="showModal('modal-redeem')">Redeem</button></div></div>
+        <div class="reward-card"><div class="reward-img">🛏️</div><div class="reward-body"><div class="reward-name">Room Upgrade</div><div class="reward-pts">1 200 pts</div><button class="reward-btn" onclick="showModal('modal-redeem')">Redeem</button></div></div>
+        <div class="reward-card"><div class="reward-img">💆</div><div class="reward-body"><div class="reward-name">Spa Treatment</div><div class="reward-pts">600 pts</div><button class="reward-btn" onclick="showModal('modal-redeem')">Redeem</button></div></div>
+        <div class="reward-card"><div class="reward-img">🎰</div><div class="reward-body"><div class="reward-name">Casino Free Play</div><div class="reward-pts">500 pts</div><button class="reward-btn" onclick="showModal('modal-redeem')">Redeem</button></div></div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn" onclick="go('s-home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+      <button class="nav-btn active" onclick="go('s-rewards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Rewards</button>
+      <button class="nav-btn nav-msg-center" onclick="go('s-messages')"><div class="nav-msg-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span style="color:var(--purple);font-weight:600">Messages</span></button>
+      <button class="nav-btn" onclick="go('s-offers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Offers</button>
+      <button class="nav-btn" onclick="go('s-account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Account</button>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: OFFERS ══════════ -->
+  <div class="screen" id="s-offers" style="background:var(--bg);">
+    <div class="hdr">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <div style="font-size:20px">🏷️</div>
+        <div class="hdr-title" style="padding:0">Offers</div>
+      </div>
+      <div class="hdr-sub">Exclusive deals for Andar Rewards members</div>
+    </div>
+    <div class="scroll">
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px">Featured</div>
+      <div class="offer-featured">
+        <span class="offer-featured-tag">2x Points</span>
+        <span class="offer-featured-time">Until Mar 9, 2026</span>
+        <h3>Weekend Double Points</h3>
+        <p>Earn 2x points on all casino play every Friday, Saturday, and Sunday. Limited time — don't miss out!</p>
+        <div class="offer-bonus">⚡ +500 bonus pts</div>
+      </div>
+      <div class="offer-featured" style="margin-bottom:14px">
+        <span class="offer-featured-tag">20% Off</span>
+        <span class="offer-featured-time">Until Mar 15, 2026</span>
+        <h3>Azure Dining Special</h3>
+        <p>Enjoy 20% off your total bill at Azure restaurant, plus earn 150 bonus points per visit.</p>
+        <div class="offer-bonus">⚡ +150 bonus pts</div>
+      </div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px">All Offers</div>
+      <div class="pills">
+        <div class="pill active">All</div>
+        <div class="pill">Gaming</div>
+        <div class="pill">Dining</div>
+        <div class="pill">Rooms</div>
+        <div class="pill">Spa</div>
+      </div>
+      <div class="offer-item">
+        <div class="offer-item-icon">🎰</div>
+        <div class="offer-item-body">
+          <div class="offer-item-name">Weekend Double Points <span class="offer-item-badge">2x Points</span></div>
+          <div class="offer-item-desc">Earn 2x on all casino play every Fri, Sat & Sun</div>
+          <div class="offer-item-footer"><span class="offer-pts">+500 bonus pts</span><span class="offer-expiry">Until Mar 9, 2026</span></div>
+        </div>
+      </div>
+      <div class="offer-item">
+        <div class="offer-item-icon">🎰</div>
+        <div class="offer-item-body">
+          <div class="offer-item-name">Happy Hour Bonus <span class="offer-item-badge" style="background:#E8A800">3x Points</span></div>
+          <div class="offer-item-desc">Visit 5pm–7pm daily, earn 3x points per minute</div>
+          <div class="offer-item-footer"><span class="offer-pts">+300 bonus pts</span><span class="offer-expiry">Until Mar 31, 2026</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn" onclick="go('s-home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+      <button class="nav-btn" onclick="go('s-rewards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Rewards</button>
+      <button class="nav-btn nav-msg-center" onclick="go('s-messages')"><div class="nav-msg-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span style="color:var(--purple);font-weight:600">Messages</span></button>
+      <button class="nav-btn active" onclick="go('s-offers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Offers</button>
+      <button class="nav-btn" onclick="go('s-account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Account</button>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: ACCOUNT ══════════ -->
+  <div class="screen" id="s-account" style="background:var(--bg);">
+    <div class="account-hdr">
+      <div class="account-user">
+        <div class="account-avatar">A</div>
+        <div>
+          <div class="account-name">Alex Johnson</div>
+          <div class="account-since">Member since February 2026</div>
+          <div class="account-tier-tag">⭐ Silver Member</div>
+        </div>
+      </div>
+      <div class="account-balance-card">
+        <div class="account-bal-main">3 240 <span class="account-bal-unit">pts</span></div>
+        <div class="account-bal-sub">App-earned points · available to redeem</div>
+        <div class="account-casino-bal">
+          <div>
+            <div class="account-casino-label">Casino Balance (TableTrack)</div>
+            <div class="account-casino-amount">1 850 pts</div>
+          </div>
+          <div class="account-casino-source">Status only<br>via CMS</div>
+        </div>
+        <div class="progress-wrap-home" style="margin-top:10px"><div class="progress-fill-home"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px">
+          <span style="font-size:11px;color:var(--text-soft)">Silver</span>
+          <span style="font-size:11px;color:var(--text-soft)">1 760 pts to Gold</span>
+        </div>
+      </div>
+    </div>
+    <div class="scroll">
+      <div class="menu-card">
+        <div class="menu-item" onclick="go('s-casinopts')">
+          <div class="menu-icon" style="background:#E8F0FF">🎰</div>
+          <div class="menu-text"><strong>Casino Points</strong><span>Track your session in real time</span></div>
+          <div class="menu-arrow">›</div>
+        </div>
+        <div class="menu-item" onclick="go('s-history')">
+          <div class="menu-icon" style="background:#E8F0FF">🕐</div>
+          <div class="menu-text"><strong>Points History</strong><span>View all earned and redeemed points</span></div>
+          <div class="menu-arrow">›</div>
+        </div>
+        <div class="menu-item" onclick="go('s-profile')">
+          <div class="menu-icon" style="background:#FEF3E0">👤</div>
+          <div class="menu-text"><strong>Profile & Benefits</strong><span>View tier status, benefits, and settings</span></div>
+          <div class="menu-arrow">›</div>
+        </div>
+        <div class="menu-item" onclick="go('s-messages')">
+          <div class="menu-icon" style="background:var(--purple-light)">💬</div>
+          <div class="menu-text"><strong>Messages</strong><span>Alerts, offers, and host messages</span></div>
+          <span class="menu-badge">2</span>
+          <div class="menu-arrow">›</div>
+        </div>
+        <div class="menu-item" onclick="go('s-notifications')">
+          <div class="menu-icon" style="background:#E8F5E9">🔔</div>
+          <div class="menu-text"><strong>Notifications</strong><span>System alerts and activity updates</span></div>
+          <span class="menu-badge" style="background:var(--red)">3</span>
+          <div class="menu-arrow">›</div>
+        </div>
+      </div>
+      <div class="signout-item">
+        <div class="signout-icon">🚪</div>
+        <span style="font-size:14px;font-weight:600;color:var(--red)">Sign Out</span>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn" onclick="go('s-home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+      <button class="nav-btn" onclick="go('s-rewards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Rewards</button>
+      <button class="nav-btn nav-msg-center" onclick="go('s-messages')"><div class="nav-msg-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span style="color:var(--purple);font-weight:600">Messages</span></button>
+      <button class="nav-btn" onclick="go('s-offers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Offers</button>
+      <button class="nav-btn active" onclick="go('s-account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Account</button>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: HISTORY ══════════ -->
+  <div class="screen" id="s-history" style="background:var(--bg);">
+    <div class="hdr">
+      <div class="hdr-row"><button class="back-btn" onclick="go('s-home')">←</button><div class="hdr-title">Points History</div></div>
+    </div>
+    <div class="scroll">
+      <div class="pills"><div class="pill active">All</div><div class="pill">Earned</div><div class="pill">Spent</div></div>
+      <div class="card">
+        <div class="tx-item"><div class="tx-icon earn">📈</div><div><div class="tx-label">Casino — 3 hrs</div><div class="tx-date">2026-03-03</div></div><div class="tx-amount earn">+180 pts</div></div>
+        <div class="tx-item"><div class="tx-icon spend">📉</div><div><div class="tx-label">Redeemed: Dinner for 2 at Azure</div><div class="tx-date">2026-03-02</div></div><div class="tx-amount spend">−800 pts</div></div>
+        <div class="tx-item"><div class="tx-icon earn">📈</div><div><div class="tx-label">Casino — 2 hrs</div><div class="tx-date">2026-03-01</div></div><div class="tx-amount earn">+120 pts</div></div>
+        <div class="tx-item"><div class="tx-icon earn">📈</div><div><div class="tx-label">Hotel Stay — 2 nights</div><div class="tx-date">2026-02-28</div></div><div class="tx-amount earn">+500 pts</div></div>
+        <div class="tx-item"><div class="tx-icon spend">📉</div><div><div class="tx-label">Redeemed: Spa Treatment</div><div class="tx-date">2026-02-27</div></div><div class="tx-amount spend">−600 pts</div></div>
+        <div class="tx-item"><div class="tx-icon earn">📈</div><div><div class="tx-label">Casino — 4 hrs</div><div class="tx-date">2026-02-26</div></div><div class="tx-amount earn">+240 pts</div></div>
+        <div class="tx-item"><div class="tx-icon earn">📈</div><div><div class="tx-label">Dining at Azure</div><div class="tx-date">2026-02-25</div></div><div class="tx-amount earn">+150 pts</div></div>
+        <div class="tx-item" style="border:none"><div class="tx-icon spend">📉</div><div><div class="tx-label">Redeemed: Room Upgrade</div><div class="tx-date">2026-02-23</div></div><div class="tx-amount spend">−1 200 pts</div></div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn" onclick="go('s-home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+      <button class="nav-btn" onclick="go('s-rewards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Rewards</button>
+      <button class="nav-btn nav-msg-center" onclick="go('s-messages')"><div class="nav-msg-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span style="color:var(--purple);font-weight:600">Messages</span></button>
+      <button class="nav-btn" onclick="go('s-offers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Offers</button>
+      <button class="nav-btn" onclick="go('s-account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Account</button>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: PROFILE ══════════ -->
+  <div class="screen" id="s-profile" style="background:var(--bg);">
+    <div class="hdr">
+      <div class="hdr-row"><button class="back-btn" onclick="go('s-account')">←</button><div class="hdr-title">Profile</div></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
+        <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:white">A</div>
+        <div><div style="color:white;font-size:17px;font-weight:600">Alex Johnson</div><div style="color:rgba(255,255,255,.6);font-size:12px">Member since February 2026</div><div style="margin-top:4px"><span class="account-tier-tag">⭐ Silver Member</span></div></div>
+      </div>
+    </div>
+    <div class="scroll">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:14px;font-weight:600;color:var(--text)">Your Tier Status</span><span class="tier-badge">Silver</span></div>
+        <div style="font-size:28px;font-weight:700;color:var(--text);margin:8px 0 2px">3 240 pts</div>
+        <div style="font-size:12px;color:var(--text-soft)">1 760 pts until Gold tier</div>
+        <div class="progress-wrap-home" style="margin-top:10px"><div class="progress-fill-home"></div></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span style="font-size:18px">⭐</span><span style="font-size:14px;font-weight:600;color:var(--text)">Silver Benefits</span></div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="color:var(--green);font-size:18px">✅</span><span style="font-size:13px;color:var(--text)">Earn 1 pt per minute on property</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="color:var(--green);font-size:18px">✅</span><span style="font-size:13px;color:var(--text)">Access to member-only dining deals</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="color:var(--green);font-size:18px">✅</span><span style="font-size:13px;color:var(--text)">Early access to resort events</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="color:var(--green);font-size:18px">✅</span><span style="font-size:13px;color:var(--text)">Free Wi-Fi in all rooms</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="color:var(--green);font-size:18px">✅</span><span style="font-size:13px;color:var(--text)">Priority host messaging response</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px">Settings</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🔔</span><span style="font-size:14px;color:var(--text)">Notifications</span></div>
+          <div style="width:44px;height:26px;background:var(--purple);border-radius:13px;position:relative"><div style="position:absolute;right:3px;top:3px;width:20px;height:20px;background:white;border-radius:50%"></div></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;cursor:pointer" onclick="go('s-auth')">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px;color:var(--red)">🚪</span><span style="font-size:14px;color:var(--red);font-weight:600">Sign Out</span></div>
+          <span style="color:var(--text-soft)">›</span>
+        </div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn" onclick="go('s-home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+      <button class="nav-btn" onclick="go('s-rewards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Rewards</button>
+      <button class="nav-btn nav-msg-center" onclick="go('s-messages')"><div class="nav-msg-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span style="color:var(--purple);font-weight:600">Messages</span></button>
+      <button class="nav-btn" onclick="go('s-offers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Offers</button>
+      <button class="nav-btn active" onclick="go('s-account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Account</button>
+    </div>
+  </div>
+
+  <!-- ══════════ SCREEN: NOTIFICATIONS ══════════ -->
+  <div class="screen" id="s-notifications" style="background:var(--bg);">
+    <div class="hdr"><div class="hdr-row"><button class="back-btn" onclick="go('s-account')">←</button><div class="hdr-title">Notifications</div></div></div>
+    <div class="scroll">
+      <div class="card"><div style="display:flex;gap:12px;align-items:flex-start"><div style="font-size:22px">🏅</div><div><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px">Points Earned!</div><div style="font-size:13px;color:var(--text-mid);margin-bottom:4px">You've been at Andar for 1 hour — 60 pts earned!</div><div style="font-size:11px;color:var(--text-soft)">46 days ago</div></div></div></div>
+      <div class="card"><div style="display:flex;gap:12px;align-items:flex-start"><div style="font-size:22px">👋</div><div><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px">Welcome back!</div><div style="font-size:13px;color:var(--text-mid);margin-bottom:4px">Welcome back to Andar Rewards! Your current balance is 3,240 pts.</div><div style="font-size:11px;color:var(--text-soft)">47 days ago</div></div></div></div>
+      <div class="card"><div style="display:flex;gap:12px;align-items:flex-start"><div style="font-size:22px">📅</div><div><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px">Reservation Reminder</div><div style="font-size:13px;color:var(--text-mid);margin-bottom:4px">Your reservation at Azure is tomorrow. We look forward to seeing you!</div><div style="font-size:11px;color:var(--text-soft)">48 days ago</div></div></div></div>
+      <div class="card"><div style="display:flex;gap:12px;align-items:flex-start"><div style="font-size:22px">🎁</div><div><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px">Reward Redeemed</div><div style="font-size:13px;color:var(--text-mid);margin-bottom:4px">You successfully redeemed Dinner for 2 at Azure. Enjoy!</div><div style="font-size:11px;color:var(--text-soft)">49 days ago</div></div></div></div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn" onclick="go('s-home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home</button>
+      <button class="nav-btn" onclick="go('s-rewards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>Rewards</button>
+      <button class="nav-btn nav-msg-center" onclick="go('s-messages')"><div class="nav-msg-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span style="color:var(--purple);font-weight:600">Messages</span></button>
+      <button class="nav-btn" onclick="go('s-offers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Offers</button>
+      <button class="nav-btn active" onclick="go('s-account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Account</button>
+    </div>
+  </div>
+
+  <!-- ══════════ MODALS ══════════ -->
+  <!-- Jackpot modal -->
+  <div class="modal-overlay" id="modal-jackpot" onclick="closeModal('modal-jackpot')">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:56px;margin-bottom:12px">🎰</div>
+        <div class="modal-title" style="text-align:center">JACKPOT!</div>
+        <div class="modal-sub" style="text-align:center">Your host will be notified immediately and will come to assist you right away.</div>
+      </div>
+      <button class="btn-yellow" style="margin-bottom:10px" onclick="closeModal('modal-jackpot');showModal('modal-jackpot-sent')">🚨 Alert My Host Now</button>
+      <button class="btn-outline" onclick="closeModal('modal-jackpot')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Jackpot sent -->
+  <div class="modal-overlay" id="modal-jackpot-sent" onclick="closeModal('modal-jackpot-sent')">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div style="text-align:center;padding:10px 0 20px">
+        <div style="font-size:52px;margin-bottom:12px">✅</div>
+        <div class="modal-title" style="text-align:center">Host Notified!</div>
+        <div class="modal-sub" style="text-align:center">Michael, your VIP Host, has been alerted. He'll be with you in a moment. Average response time: 2–3 min.</div>
+        <div style="background:var(--purple-light);border-radius:14px;padding:14px;margin-top:4px;text-align:left">
+          <div style="font-size:12px;font-weight:600;color:var(--purple-dark);margin-bottom:4px">Michael — VIP Host</div>
+          <div style="font-size:12px;color:var(--text-mid)">On his way to your location 🎰</div>
+        </div>
+      </div>
+      <button class="btn-yellow" onclick="closeModal('modal-jackpot-sent')">Got it</button>
+    </div>
+  </div>
+
+  <!-- Contact host modal -->
+  <div class="modal-overlay" id="modal-contact" onclick="closeModal('modal-contact')">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Contact a Host</div>
+      <div class="modal-sub">Choose your request type</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+        <div style="background:var(--purple-light);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer"><span style="font-size:22px">🍽️</span><span style="font-size:14px;font-weight:500;color:var(--text)">Dining reservation help</span><span style="margin-left:auto;color:var(--text-soft)">›</span></div>
+        <div style="background:var(--purple-light);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer"><span style="font-size:22px">🛏️</span><span style="font-size:14px;font-weight:500;color:var(--text)">Room service request</span><span style="margin-left:auto;color:var(--text-soft)">›</span></div>
+        <div style="background:var(--purple-light);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer"><span style="font-size:22px">❓</span><span style="font-size:14px;font-weight:500;color:var(--text)">General question</span><span style="margin-left:auto;color:var(--text-soft)">›</span></div>
+        <div style="background:var(--purple-light);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer"><span style="font-size:22px">✍️</span><span style="font-size:14px;font-weight:500;color:var(--text)">Write a custom message</span><span style="margin-left:auto;color:var(--text-soft)">›</span></div>
+      </div>
+      <button class="btn-outline" onclick="closeModal('modal-contact')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Redeem modal -->
+  <div class="modal-overlay" id="modal-redeem" onclick="closeModal('modal-redeem')">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Confirm Redemption</div>
+      <div style="background:var(--purple-light);border-radius:14px;padding:16px;margin:16px 0;display:flex;align-items:center;gap:14px">
+        <span style="font-size:32px">🍽️</span>
+        <div><div style="font-size:15px;font-weight:600;color:var(--text)">Dinner for 2 at Azure</div><div style="font-size:13px;color:var(--text-mid);margin-top:4px">800 pts will be deducted from your balance</div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-mid);margin-bottom:6px"><span>Current balance</span><span style="font-weight:600;color:var(--text)">3 240 pts</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-mid);margin-bottom:6px"><span>Cost</span><span style="font-weight:600;color:var(--red)">−800 pts</span></div>
+      <hr class="divider">
+      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:20px"><span style="font-weight:600;color:var(--text)">Remaining balance</span><span style="font-weight:700;color:var(--purple)">2 440 pts</span></div>
+      <button class="btn-yellow" style="margin-bottom:10px" onclick="closeModal('modal-redeem')">Confirm Redemption</button>
+      <button class="btn-outline" onclick="closeModal('modal-redeem')">Cancel</button>
+    </div>
+  </div>
+
+</div><!-- /phone -->
+
+<div class="screen-indicator" id="screen-indicator">Age Gate</div>
+
+<script>
+let sessionInterval = null;
+let sessionSeconds = 0;
+let sessionPts = 0;
+let baseCounter = 3240;
+
+const screenNames = {
+  'agegate': 'Age Gate',
+  'onboarding': 'Onboarding',
+  'auth': 'Login / Register',
+  'register': 'Create Account',
+  'home': 'Home',
+  'casinopts': 'Casino Points',
+  'messages': 'Messages',
+  'rewards': 'Rewards',
+  'offers': 'Offers',
+  'account': 'Account',
+  'history': 'Points History',
+  'profile': 'Profile & Benefits',
+  'notifications': 'Notifications',
+};
+
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+  const el = document.getElementById(id);
+  if (el) { el.style.display = 'flex'; }
+  const key = id.replace('s-', '');
+  document.getElementById('screen-indicator').textContent = screenNames[key] || key;
+}
+
+function showModal(id) {
+  const m = document.getElementById(id);
+  if (m) { m.classList.add('active'); }
+}
+
+function closeModal(id) {
+  const m = document.getElementById(id);
+  if (m) { m.classList.remove('active'); }
+}
+
+function showLiveTracking() {
+  document.getElementById('live-tracking-card').style.display = 'block';
+  if (sessionInterval) clearInterval(sessionInterval);
+  sessionInterval = setInterval(() => {
+    sessionSeconds++;
+    sessionPts = Math.floor(sessionSeconds / 60);
+    const m = Math.floor(sessionSeconds / 60);
+    const s = sessionSeconds % 60;
+    document.getElementById('session-timer').textContent = m + ':' + String(s).padStart(2,'0');
+    document.getElementById('session-pts').textContent = '+' + sessionPts + ' pts';
+    document.getElementById('live-counter').textContent = (baseCounter + sessionPts).toLocaleString();
+  }, 1000);
+}
+
+// pill click handler
+document.querySelectorAll('.pills').forEach(container => {
+  container.querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      container.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+    });
+  });
+});
+
+// initial state — hide all, then show age gate
+document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+document.getElementById('s-agegate').style.display = 'flex';
+</script>
+</body>
+</html>
